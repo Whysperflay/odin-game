@@ -1,0 +1,612 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol,
+ul {
+    list-style: none;
+}
+blockquote,
+q {
+    quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content: "";
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* Debut feuille de style */
+body {
+    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    padding: 20px;
+}
+
+/* Ecran de connexion centré */
+.ecran-centre {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 95%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* Carte contenant le formulaire */
+.carte-pseudo {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 350px;
+    animation: apparition 0.5s ease-out;
+}
+
+/* Titre */
+.carte-pseudo h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #00cccc;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+/* Groupe de formulaire */
+.form-groupe {
+    margin-bottom: 25px;
+}
+
+.form-groupe label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #555;
+    font-weight: 500;
+}
+
+/* Input */
+#inputPseudo {
+    width: 100%;
+    padding: 15px;
+    font-size: 1em;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+#inputPseudo:focus {
+    border-color: #00cccc;
+    box-shadow: 0 0 0 3px rgba(0, 204, 204, 0.1);
+}
+
+#inputPseudo::placeholder {
+    color: #aaa;
+}
+
+/* Bouton */
+#btnDemarrer {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#btnDemarrer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+#btnDemarrer:active {
+    transform: translateY(0);
+}
+
+.message-cache {
+    display: none;
+}
+
+/* Zone de jeu principale */
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: calc(100vh - 60px); /* hauteur écran - footer */
+    padding: 20px;
+    padding-bottom: 80px; /* espace pour le footer */
+    box-sizing: border-box;
+}
+
+/* Ma main en bas au centre */
+#maMain {
+    position: fixed;
+    bottom: 60px; /* au-dessus du footer */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+}
+
+#maMain ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+#maMain ul li {
+    padding: 12px 18px;
+    border: 2px solid #00cccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    min-width: 80px;
+    text-align: center;
+}
+
+#maMain ul li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    color: white;
+}
+
+#maMain ul li:active {
+    transform: translateY(-2px);
+}
+
+/* Tas au milieu (pour plus tard) */
+#tasCartes {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 200px;
+    border: 3px dashed #667eea;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+#tasCartes li {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#tasCartes li:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(0, 204, 204, 0.3);
+}
+
+#tasCartes li.selectionneTas {
+    background: linear-gradient(135deg, #00cccc 0%, #0099cc 100%);
+    color: white;
+    border-color: #0099cc;
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.5);
+}
+
+/* Cartes adversaires en haut */
+.adversaire {
+    position: absolute;
+    top: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    min-width: 150px;
+}
+
+#adversaire1 {
+    left: 20px;
+}
+
+#adversaire2 {
+    right: 20px;
+}
+
+.adversaire .nom {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.adversaire .nbCartes {
+    font-size: 1.5em;
+    color: #333;
+}
+
+/* Footer fixe */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    color: white;
+    font-size: 0.9em;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.selectionne {
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
+    color: white;
+}
+
+#btnJouerCarte {
+    margin-left: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: fixed;
+    bottom: 170px;
+}
+
+#btnJouerCarte:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+#tasDiv ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+
+#tasDiv ul li {
+    padding: 8px 12px;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    font-weight: 500;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* ========== ÉCRAN FIN DE MANCHE ========== */
+#scoreManche {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    text-align: center;
+    min-width: 400px;
+}
+
+#scoreManche h2 {
+    font-size: 1.8em;
+    color: #00cccc;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#scoreManche table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#scoreManche thead tr {
+    background: #00cccc;
+    color: white;
+}
+
+#scoreManche th {
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+#scoreManche th:nth-child(2),
+#scoreManche th:nth-child(3) {
+    text-align: center;
+}
+
+#scoreManche td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#scoreManche td:nth-child(2),
+#scoreManche td:nth-child(3) {
+    text-align: center;
+}
+
+#scoreManche tbody tr.moi {
+    background: #fff3cd;
+    font-weight: bold;
+}
+
+#scoreManche .message-attente {
+    margin-top: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+/* ========== ÉCRAN FIN DE PARTIE ========== */
+#finPartie {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 9999;
+}
+
+.titre-fin {
+    font-size: 3em;
+    margin-bottom: 30px;
+}
+
+.encadre-gagnant {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px 40px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    backdrop-filter: blur(10px);
+}
+
+.gagnant-moi {
+    font-size: 2.5em;
+    font-weight: bold;
+}
+
+.gagnant-autre {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.gagnant-egalite {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.encadre-classement {
+    background: white;
+    color: #333;
+    padding: 30px;
+    border-radius: 15px;
+    min-width: 400px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.encadre-classement h3 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #667eea;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.tableau-classement {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableau-classement thead tr {
+    background: #667eea;
+    color: white;
+}
+
+.tableau-classement th {
+    padding: 10px;
+    font-weight: bold;
+}
+
+.tableau-classement th:first-child {
+    text-align: center;
+}
+
+.tableau-classement th:nth-child(2) {
+    text-align: left;
+}
+
+.tableau-classement th:last-child {
+    text-align: center;
+}
+
+.tableau-classement td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tableau-classement td.medaille {
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.tableau-classement td.score {
+    text-align: center;
+    font-weight: bold;
+}
+
+.tableau-classement tbody tr.ligne-moi {
+    background: #fff3cd;
+    font-weight: bold;
+}
+
+.btn-rejouer {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 1.2em;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn-rejouer:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-rejouer:active {
+    transform: scale(1.05);
+}
