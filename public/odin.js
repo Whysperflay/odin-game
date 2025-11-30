@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!btnJouerCarte) {
             btnJouerCarte = document.createElement("button");
-            btnJouerCarte.textContent = "Jouer la carte";
+            btnJouerCarte.textContent = "Passer le tour";
             btnJouerCarte.id = "btnJouerCarte";
             document.querySelector("main").appendChild(btnJouerCarte);
 
@@ -125,21 +125,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 }
 
-                if (cartesJouees.length === 0 && confirm("Aucune carte sélectionnée. Voulez-vous passer votre tour ?")) {
-                    sock.emit("jouer_carte", []);
-                    for (let i = 0; i < cartes.length; i++) {
-                        cartes[i].classList.remove("selectionne");
+                if (cartesJouees.length === 0) {
+                    if (confirm("Voulez-vous passer votre tour ?")) {
+                        sock.emit("jouer_carte", []);
+                        for (let i = 0; i < cartes.length; i++) {
+                            cartes[i].classList.remove("selectionne");
+                        }
+                        btnJouerCarte.style.display = "none";
+                        btnJouerCarte.textContent = "Passer le tour";
                     }
-                    btnJouerCarte.style.display = "none";
                     return;
                 }
 
-                console.log("Cartes jouées :", cartesJouees);
-                sock.emit("jouer_carte", cartesJouees);
+                if (cartesJouees.length > 0) {
+                    console.log("Cartes jouées :", cartesJouees);
+                    sock.emit("jouer_carte", cartesJouees);
+                }
             });
         }
 
         btnJouerCarte.style.display = "block";
+        btnJouerCarte.textContent = "Passer le tour";
 
         attacherListenersCartes();
     }
@@ -149,6 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!maMain) return;
 
         const cartes = maMain.getElementsByTagName("li");
+        const btnJouerCarte = document.getElementById("btnJouerCarte");
 
         for (let i = 0; i < cartes.length; i++) {
             const nouvelleCarteLi = cartes[i].cloneNode(true);
@@ -156,6 +163,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             nouvelleCarteLi.addEventListener("click", function () {
                 this.classList.toggle("selectionne");
+
+                // Mettre à jour le texte du bouton
+                if (btnJouerCarte) {
+                    const cartesSelectionnees = document.querySelectorAll("#maMain li.selectionne");
+                    if (cartesSelectionnees.length > 0) {
+                        btnJouerCarte.textContent = "Jouer la carte";
+                    } else {
+                        btnJouerCarte.textContent = "Passer le tour";
+                    }
+                }
             });
         }
     }
