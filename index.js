@@ -715,19 +715,26 @@ io.on("connection", (socket) => {
      *  Gestion des déconnexions
      */
     socket.on("disconnect", function () {
-        console.log("Déconnexion du joueur" + socket.id);
+        console.log("Déconnexion du joueur " + socket.id);
+
+        // Vérifier que le joueur était bien dans une partie
+        if (partie === null || !parties[partie]) {
+            console.log("Le joueur n'était pas dans une partie active.");
+            return;
+        }
+
         // CONNAITRE qui se déconnecte
-        let index = parties[partie].joueurs.findIndex((j) => j.socket.id === socket.id);
-        console.log("Index du joueur déconnecté dans la partie " + partie + " : " + index);
-        console.log("Pseudo du joueur déconnecté : " + (index >= 0 ? parties[partie].joueurs[index].pseudo : "Inconnu"));
+        let indexJoueur = parties[partie].joueurs.findIndex((j) => j.socket.id === socket.id);
+        console.log("Index du joueur déconnecté dans la partie " + partie + " : " + indexJoueur);
+        console.log("Pseudo du joueur déconnecté : " + (indexJoueur >= 0 ? parties[partie].joueurs[indexJoueur].pseudo : "Inconnu"));
 
         // Si le joueur faisait partie d'une partie en cours
-        if (index >= 0 && parties[partie]) {
+        if (indexJoueur >= 0) {
             console.log("Fin de la partie (abandon)");
 
             // Notifier les joueurs
             for (let i = 0; i < parties[partie].joueurs.length; i++) {
-                if (i !== index && parties[partie].joueurs[i]) {
+                if (i !== indexJoueur && parties[partie].joueurs[i]) {
                     parties[partie].joueurs[i].socket.emit("deconnexion", "Un adversaire s'est déconnecté.");
                 }
             }
