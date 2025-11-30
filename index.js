@@ -396,10 +396,34 @@ io.on("connection", (socket) => {
             return;
         }
 
-        // lui faire selectionner une carte dans le tas
+        // Retirer les cartes jouées de la main du joueur
+        for (let c of cartesJouees) {
+            parties[partie].joueurs[index].retirerCarte(c);
+        }
+
+        // Vérifier si le joueur a vidé sa main
+        if (parties[partie].joueurs[index].getNbCartes() === 0) {
+            console.log("Le joueur " + parties[partie].joueurs[index].pseudo + " a vidé sa main !");
+
+            // Mettre à jour le tas avec les cartes jouées
+            parties[partie].tasCartes = cartesJouees;
+
+            // Envoyer la main vide au joueur
+            parties[partie].joueurs[index].envoyerMain();
+
+            // Fin de manche directe, pas de sélection dans le tas
+            socket.emit("coup_valide");
+            finDeManche();
+            return;
+        }
+
+        // Le joueur a encore des cartes, il doit sélectionner une carte dans le tas
         parties[partie].passesConsecutives = 0;
         parties[partie].dernierJoueurActif = index;
         parties[partie].cartesEnCoursDejeu = cartesJouees;
+
+        // Envoyer la main mise à jour au joueur
+        parties[partie].joueurs[index].envoyerMain();
 
         socket.emit("coup_valide");
         socket.emit("selectionner_carte_dans_tas", parties[partie].tasCartes);
@@ -430,13 +454,8 @@ io.on("connection", (socket) => {
             return;
         }
 
-        // ajouter la carte à la main du joueur
+        // ajouter la carte du tas à la main du joueur
         parties[partie].joueurs[index].ajouterCarte(carteTas);
-
-        // retirer les cartes jouées au joueur
-        for (let i = 0; i < cartesJouees.length; i++) {
-            parties[partie].joueurs[index].retirerCarte(cartesJouees[i]);
-        }
         parties[partie].joueurs[index].envoyerMain();
 
         // Mettre à jour le tas de cartes jouées
@@ -445,12 +464,6 @@ io.on("connection", (socket) => {
         console.log("Nouveau tas de cartes :", parties[partie].tasCartes);
 
         delete parties[partie].cartesEnCoursDejeu;
-
-        if (parties[partie].joueurs[index].getNbCartes() === 0) {
-            console.log("Le joueur " + parties[partie].joueurs[index].pseudo + " a joué toutes ses cartes !");
-            finDeManche();
-            return;
-        }
 
         // passer au joueur suivant
         passerAuJoueurSuivant();
