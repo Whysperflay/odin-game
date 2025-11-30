@@ -40,6 +40,8 @@ function supprimerPartie(partie) {
  ***                      Gestion des websockets                    ***
  **********************************************************************/
 
+const NB_MANCHES_MAX = 2;
+
 class Carte {
     valeur;
     couleur;
@@ -602,7 +604,7 @@ io.on("connection", (socket) => {
         parties[partie].nbManches++;
 
         // Vérifier fin de partie
-        if (parties[partie].nbManches >= 5) {
+        if (parties[partie].nbManches >= NB_MANCHES_MAX) {
             finDePartie();
         } else {
             // Nouvelle manche après 3 secondes
