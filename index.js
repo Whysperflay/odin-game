@@ -276,6 +276,13 @@ io.on("connection", (socket) => {
         if (parties[partie].premierTour) {
             console.log("Première manche - vérification de la carte jouée.");
             console.log("Cartes jouées :", carte);
+
+            // Au premier tour, impossible de passer
+            if (carte.length === 0) {
+                socket.emit("erreur", "Vous devez jouer au moins une carte lors du premier tour.");
+                return;
+            }
+
             if (carte.length !== 1) {
                 // si c'est toutes les cartes qu'il lui reste
                 if (parties[partie].joueurs[index].getNbCartes() !== carte.length) {
@@ -391,7 +398,7 @@ io.on("connection", (socket) => {
         }
 
         // si la valeur des cartes jouées est inférieure à celle du tas
-        if (plusGrandeValeur(cartesJouees) < plusGrandeValeur(parties[partie].tasCartes)) {
+        if (plusGrandeValeur(cartesJouees) <= plusGrandeValeur(parties[partie].tasCartes)) {
             // si la valeur des cartes jouées est inférieure à celle du tas
             console.log("Carte jouée invalide : valeur des cartes jouées inférieure à celle du joueur précédent.");
             socket.emit("erreur", "Cartes jouées invalide. La valeur des cartes jouées doit être supérieure à celle du joueur précédent.");
@@ -592,11 +599,21 @@ io.on("connection", (socket) => {
             );
         }
 
+        // Préparer les infos adversaires pour l'affichage
+        let nbCartesAdversaires = [];
+        for (let i = 0; i < 3; i++) {
+            nbCartesAdversaires.push({
+                pseudo: parties[partie].joueurs[i].getPseudo(),
+                nbCartes: parties[partie].joueurs[i].getNbCartes(),
+            });
+        }
+
         // Notifier les joueurs
         for (let i = 0; i < 3; i++) {
             parties[partie].joueurs[i].socket.emit("fin_manche", {
                 scores: scoresPartie,
                 nbManche: parties[partie].nbManches + 1,
+                nbCartesAdversaires: nbCartesAdversaires,
             });
         }
 

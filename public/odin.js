@@ -244,16 +244,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     sock.on("selectionner_carte_dans_tas", function (tasCartes) {
-        // cacher le bouton btnJouerCarte si visible
+        // Cacher le bouton btnJouerCarte si visible
         const btnJouerCarte = document.getElementById("btnJouerCarte");
         if (btnJouerCarte) btnJouerCarte.style.display = "none";
 
-        // ajout bouton btnEnvoyerCarteTas
-        const btnEnvoyerCarteTas = document.createElement("button");
-        btnEnvoyerCarteTas.textContent = "Envoyer la carte du tas";
-        btnEnvoyerCarteTas.id = "btnEnvoyerCarteTas";
+        // Réutiliser ou créer le bouton au même emplacement
+        let btnEnvoyerCarteTas = document.getElementById("btnEnvoyerCarteTas");
+
+        if (!btnEnvoyerCarteTas) {
+            btnEnvoyerCarteTas = document.createElement("button");
+            btnEnvoyerCarteTas.id = "btnEnvoyerCarteTas";
+            document.querySelector("main").appendChild(btnEnvoyerCarteTas);
+        }
+
+        btnEnvoyerCarteTas.textContent = "Sélectionner une carte du tas";
         btnEnvoyerCarteTas.style.display = "block";
-        document.querySelector("main").appendChild(btnEnvoyerCarteTas);
+        btnEnvoyerCarteTas.disabled = true;
 
         console.log("Sélectionner une carte dans le tas :", tasCartes);
         alert("C'est à vous de sélectionner une carte dans le tas.");
@@ -262,9 +268,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const cartesTasElements = document.querySelectorAll("#tasCartes li");
 
-        for (let i = 0; i < cartesTasElements.length; i++) {
-            cartesTasElements[i].addEventListener("click", function () {
-                cartesTasElements.forEach((el) => el.classList.remove("selectionneTas"));
+        // Supprimer les anciens listeners
+        cartesTasElements.forEach((el) => {
+            const clone = el.cloneNode(true);
+            el.parentNode.replaceChild(clone, el);
+        });
+
+        // Réattacher les listeners
+        const nouvellesCartesTas = document.querySelectorAll("#tasCartes li");
+
+        for (let i = 0; i < nouvellesCartesTas.length; i++) {
+            nouvellesCartesTas[i].addEventListener("click", function () {
+                nouvellesCartesTas.forEach((el) => el.classList.remove("selectionneTas"));
 
                 this.classList.add("selectionneTas");
 
@@ -273,8 +288,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 const valeur = parseInt(valeurStr);
                 maCarte = { valeur, couleur };
                 console.log("Carte du tas sélectionnée :", maCarte.valeur, maCarte.couleur);
+
+                // Activer le bouton
+                btnEnvoyerCarteTas.disabled = false;
+                btnEnvoyerCarteTas.textContent = "Valider la carte du tas";
             });
         }
+
+        // Supprimer l'ancien listener si existant
+        const nouveauBtn = btnEnvoyerCarteTas.cloneNode(true);
+        btnEnvoyerCarteTas.parentNode.replaceChild(nouveauBtn, btnEnvoyerCarteTas);
+        btnEnvoyerCarteTas = nouveauBtn;
 
         btnEnvoyerCarteTas.addEventListener("click", function () {
             if (!maCarte) {
@@ -283,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             sock.emit("carte_dans_tas_selectionnee", maCarte);
             console.log("Carte du tas envoyée :", maCarte.valeur, maCarte.couleur);
-            btnEnvoyerCarteTas.remove();
+            btnEnvoyerCarteTas.style.display = "none";
 
             const cartesTas = document.querySelectorAll("#tasCartes li");
             cartesTas.forEach((el) => el.classList.remove("selectionneTas"));
@@ -292,8 +316,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sock.on("fin_manche", function (data) {
         console.log("Fin de la manche :", data.nbManche);
-        afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
+
+        // Afficher les infos adversaires envoyées par le serveur
+        if (data.nbCartesAdversaires) {
+            afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
+        }
+
         afficherTas([]);
+
         const btnJouerCarte = document.getElementById("btnJouerCarte");
         if (btnJouerCarte) btnJouerCarte.style.display = "none";
 
@@ -301,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
         scoreMancheDiv.id = "scoreManche";
 
         const titre = document.createElement("h2");
-        titre.textContent = `Fin de la manche ${data.nbManche} / 5`;
+        titre.textContent = `Fin de la manche ${data.nbManche} / ${NB_MANCHES_MAX || 5}`;
         scoreMancheDiv.appendChild(titre);
 
         // Tableau des scores
@@ -309,12 +339,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const thead = document.createElement("thead");
         thead.innerHTML = `
-        <tr>
-            <th>Joueur</th>
-            <th>Cartes restantes</th>
-            <th>Score total</th>
-        </tr>
-    `;
+            <tr>
+                <th>Joueur</th>
+                <th>Cartes restantes</th>
+                <th>Score total</th>
+            </tr>
+        `;
         tableau.appendChild(thead);
 
         const tbody = document.createElement("tbody");
@@ -323,10 +353,10 @@ document.addEventListener("DOMContentLoaded", function () {
             tr.className = score.pseudo === monPseudo ? "moi" : "";
 
             tr.innerHTML = `
-            <td>${score.pseudo} ${score.pseudo === monPseudo ? "(vous)" : ""}</td>
-            <td>${score.cartesRestantes}</td>
-            <td>${score.scoreTotal}</td>
-        `;
+                <td>${score.pseudo} ${score.pseudo === monPseudo ? "(vous)" : ""}</td>
+                <td>${score.cartesRestantes}</td>
+                <td>${score.scoreTotal}</td>
+            `;
             tbody.appendChild(tr);
         }
         tableau.appendChild(tbody);
