@@ -715,7 +715,13 @@ io.on("connection", (socket) => {
      *  Gestion des déconnexions
      */
     socket.on("disconnect", function () {
-        console.log("Déconnexion d'un joueur");
+        console.log("Déconnexion du joueur" + socket.id);
+        // CONNAITRE qui se déconnecte
+        let index = parties[partie].joueurs.findIndex((j) => j.socket.id === socket.id);
+        console.log("Index du joueur déconnecté dans la partie " + partie + " : " + index);
+        console.log("Pseudo du joueur déconnecté : " + (index >= 0 ? parties[partie].joueurs[index].pseudo : "Inconnu"));
+
+        // Si le joueur faisait partie d'une partie en cours
         if (index >= 0 && parties[partie]) {
             console.log("Fin de la partie (abandon)");
 
