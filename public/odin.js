@@ -131,7 +131,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         for (let i = 0; i < cartes.length; i++) {
                             cartes[i].classList.remove("selectionne");
                         }
-                        btnJouerCarte.style.display = "none";
                         btnJouerCarte.textContent = "Passer le tour";
                     }
                     return;
