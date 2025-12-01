@@ -62,10 +62,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // déconnexion
     sock.on("deconnexion", function (message) {
-        alert("Déconnexion : " + message);
-        if (confirm("Recharger la page ?")) {
+        alert("Déconnexion : " + message + "\n\nRedirection dans 10 secondes...");
+        setTimeout(() => {
             location.reload();
-        }
+        }, 10000);
     });
 
     // Réception de la main
