@@ -745,7 +745,7 @@ io.on("connection", (socket) => {
         // CONNAITRE qui se déconnecte
         let indexJoueur = parties[partie].joueurs.findIndex((j) => j.socket.id === socket.id);
         console.log("Index du joueur déconnecté dans la partie " + partie + " : " + indexJoueur);
-        console.log("Pseudo du joueur déconnecté : " + (indexJoueur >= 0 ? parties[partie].joueurs[indexJoueur].pseudo : "Inconnu"));
+        console.log("Pseudo du joueur déconnecté : " + (indexJoueur >= 0 ? parties[partie].joueurs[indexJoueur].getPseudo() : "Inconnu"));
 
         // Si le joueur faisait partie d'une partie en cours
         if (indexJoueur >= 0) {
@@ -754,7 +754,7 @@ io.on("connection", (socket) => {
             // Notifier les joueurs
             for (let i = 0; i < parties[partie].joueurs.length; i++) {
                 if (i !== indexJoueur && parties[partie].joueurs[i]) {
-                    parties[partie].joueurs[i].socket.emit("deconnexion", "Un adversaire s'est déconnecté.");
+                    parties[partie].joueurs[i].socket.emit("deconnexion", parties[partie].joueurs[indexJoueur].getPseudo() + " s'est déconnecté.");
                 }
             }
 

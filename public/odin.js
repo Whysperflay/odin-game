@@ -63,6 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // déconnexion
     sock.on("deconnexion", function (message) {
         alert("Déconnexion : " + message);
+        if (confirm("Recharger la page ?")) {
+            location.reload();
+        }
     });
 
     // Réception de la main
