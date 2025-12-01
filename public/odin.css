@@ -638,3 +638,240 @@ footer {
 .btn-rejouer:active {
     transform: scale(1.05);
 }
+
+/* ========== BANNIÈRE D'ÉTAT ========== */
+#banniereEtat {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 40px;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    min-width: 300px;
+    z-index: 500;
+    transition: all 0.3s ease;
+}
+
+#banniereEtat.mon-tour {
+    background: linear-gradient(135deg, #00cc88 0%, #00aa66 100%);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+#banniereEtat.tour-autre {
+    background: rgba(200, 200, 200, 0.95);
+    color: #333;
+}
+
+#banniereEtat.premier-tour {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+#banniereEtat.selection-tas {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+#banniereEtat .message-principal {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#banniereEtat .message-secondaire {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.05);
+    }
+}
+
+/* ========== NOTIFICATIONS TOAST ========== */
+#conteneurToasts {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+}
+
+.toast {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease-out;
+    border-left: 4px solid #667eea;
+}
+
+.toast.erreur {
+    border-left-color: #ff4757;
+    background: #fff5f5;
+}
+
+.toast.succes {
+    border-left-color: #00cc88;
+    background: #f0fff4;
+}
+
+.toast.info {
+    border-left-color: #667eea;
+    background: #f0f5ff;
+}
+
+.toast.warning {
+    border-left-color: #ffa502;
+    background: #fffaf0;
+}
+
+.toast-icone {
+    font-size: 1.5em;
+}
+
+.toast-contenu {
+    flex: 1;
+}
+
+.toast-titre {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.toast-message {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.toast-fermer {
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.toast-fermer:hover {
+    color: #333;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+/* ========== MODAL DE CONFIRMATION ========== */
+#modalConfirmation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-contenu {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 300px;
+    animation: zoomIn 0.3s ease-out;
+}
+
+.modal-titre {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.modal-message {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.modal-boutons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-btn-oui {
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    color: white;
+}
+
+.modal-btn-oui:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.4);
+}
+
+.modal-btn-non {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.modal-btn-non:hover {
+    background: #d0d0d0;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
