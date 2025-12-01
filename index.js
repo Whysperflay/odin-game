@@ -40,7 +40,7 @@ function supprimerPartie(partie) {
  ***                      Gestion des websockets                    ***
  **********************************************************************/
 
-const NB_MANCHES_MAX = 2;
+const NB_MANCHES_MAX = 3;
 
 class Carte {
     valeur;
