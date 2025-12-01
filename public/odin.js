@@ -45,159 +45,24 @@ document.addEventListener("DOMContentLoaded", function () {
         inputPseudo.disabled = true;
     });
 
-    // ========== SYSTÈME DE NOTIFICATIONS ==========
-
     /**
-     * Crée le conteneur de toasts si inexistant
-     */
-    function creerConteneurToasts() {
-        if (!document.getElementById("conteneurToasts")) {
-            const conteneur = document.createElement("div");
-            conteneur.id = "conteneurToasts";
-            document.body.appendChild(conteneur);
-        }
-    }
-
-    /**
-     * Affiche une notification toast
-     * @param {string} message - Le message à afficher
-     * @param {string} type - Type: 'info', 'succes', 'erreur', 'warning'
-     * @param {number} duree - Durée en ms (défaut: 4000)
-     */
-    function afficherToast(message, type = "info", duree = 4000) {
-        creerConteneurToasts();
-        const conteneur = document.getElementById("conteneurToasts");
-
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
-
-        const icones = {
-            info: "ℹ️",
-            succes: "✅",
-            erreur: "❌",
-            warning: "⚠️",
-        };
-
-        toast.innerHTML = `
-            <div class="toast-icone">${icones[type]}</div>
-            <div class="toast-contenu">
-                <div class="toast-message">${message}</div>
-            </div>
-            <div class="toast-fermer">×</div>
-        `;
-
-        conteneur.appendChild(toast);
-
-        // Fermeture manuelle
-        toast.querySelector(".toast-fermer").addEventListener("click", () => {
-            toast.style.animation = "slideOut 0.3s ease-out";
-            setTimeout(() => toast.remove(), 300);
-        });
-
-        // Fermeture automatique
-        setTimeout(() => {
-            if (toast.parentElement) {
-                toast.style.animation = "slideOut 0.3s ease-out";
-                setTimeout(() => toast.remove(), 300);
-            }
-        }, duree);
-    }
-
-    /**
-     * Met à jour la bannière d'état en haut
-     * @param {string} messagePrincipal
-     * @param {string} messageSecondaire
-     * @param {string} classe - 'mon-tour', 'tour-autre', 'premier-tour', 'selection-tas'
-     */
-    function afficherBanniere(messagePrincipal, messageSecondaire = "", classe = "") {
-        let banniere = document.getElementById("banniereEtat");
-
-        if (!banniere) {
-            banniere = document.createElement("div");
-            banniere.id = "banniereEtat";
-            document.body.appendChild(banniere);
-        }
-
-        banniere.className = classe;
-        banniere.innerHTML = `
-            <div class="message-principal">${messagePrincipal}</div>
-            ${messageSecondaire ? `<div class="message-secondaire">${messageSecondaire}</div>` : ""}
-        `;
-    }
-
-    /**
-     * Affiche un modal de confirmation
+     * Affichage message en attente d'adversaire
      * @param {string} message
-     * @param {function} callbackOui
      */
-    function afficherModalConfirmation(message, callbackOui) {
-        const modal = document.createElement("div");
-        modal.id = "modalConfirmation";
-
-        modal.innerHTML = `
-            <div class="modal-contenu">
-                <div class="modal-titre">Confirmation</div>
-                <div class="modal-message">${message}</div>
-                <div class="modal-boutons">
-                    <button class="modal-btn modal-btn-non">Non</button>
-                    <button class="modal-btn modal-btn-oui">Oui</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        modal.querySelector(".modal-btn-non").addEventListener("click", () => {
-            modal.remove();
-        });
-
-        modal.querySelector(".modal-btn-oui").addEventListener("click", () => {
-            modal.remove();
-            callbackOui();
-        });
-
-        // Clic sur le fond pour fermer
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) {
-                modal.remove();
-            }
-        });
-    }
-
-    // ========== REMPLACEMENT DES ALERTS ==========
-
-    // Affichage message en attente d'adversaire
     sock.on("en_attente", function (message) {
         btnDemarrer.innerHTML = message;
-        afficherBanniere("En attente de joueurs...", "La partie démarrera quand 3 joueurs seront connectés", "tour-autre");
     });
 
     // Affichage message erreur
     sock.on("erreur", function (message) {
-        afficherToast(message, "erreur", 5000);
-
-        // Réafficher le bouton si le joueur avait essayé de jouer
-        const btnJouerCarte = document.getElementById("btnJouerCarte");
-        if (btnJouerCarte) {
-            btnJouerCarte.style.display = "block";
-        }
-
-        // Si on est en phase de connexion, réactiver les champs
-        if (btnDemarrer && btnDemarrer.disabled) {
-            btnDemarrer.disabled = false;
-            inputPseudo.disabled = false;
-        }
+        alert("Erreur : " + message);
+        btnDemarrer.disabled = false;
+        inputPseudo.disabled = false;
     });
 
     // déconnexion
     sock.on("deconnexion", function (message) {
-        afficherToast(message, "erreur", 10000);
-        afficherBanniere("⚠️ Partie interrompue", "Un adversaire s'est déconnecté", "tour-autre");
-
-        // Redirection après 5 secondes
-        setTimeout(() => {
-            location.reload();
-        }, 5000);
+        alert("Déconnexion : " + message);
     });
 
     // Réception de la main
@@ -236,6 +101,80 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = document.querySelector("main") || document.body;
         container.appendChild(mainDiv);
     });
+
+    function jouerUneCarte() {
+        let btnJouerCarte = document.getElementById("btnJouerCarte");
+
+        if (!btnJouerCarte) {
+            btnJouerCarte = document.createElement("button");
+            btnJouerCarte.textContent = "Passer le tour";
+            btnJouerCarte.id = "btnJouerCarte";
+            document.querySelector("main").appendChild(btnJouerCarte);
+
+            btnJouerCarte.addEventListener("click", function () {
+                const maMain = document.getElementById("maMain");
+                const cartes = maMain.getElementsByTagName("li");
+                const cartesJouees = [];
+
+                for (let i = 0; i < cartes.length; i++) {
+                    if (cartes[i].classList.contains("selectionne")) {
+                        const carteTexte = cartes[i].textContent;
+                        const [valeurStr, , couleur] = carteTexte.split(" ");
+                        const valeur = parseInt(valeurStr);
+                        cartesJouees.push({ valeur, couleur });
+                    }
+                }
+
+                if (cartesJouees.length === 0) {
+                    if (confirm("Voulez-vous passer votre tour ?")) {
+                        sock.emit("jouer_carte", []);
+                        for (let i = 0; i < cartes.length; i++) {
+                            cartes[i].classList.remove("selectionne");
+                        }
+                        btnJouerCarte.textContent = "Passer le tour";
+                    }
+                    return;
+                }
+
+                if (cartesJouees.length > 0) {
+                    console.log("Cartes jouées :", cartesJouees);
+                    sock.emit("jouer_carte", cartesJouees);
+                }
+            });
+        }
+
+        btnJouerCarte.style.display = "block";
+        btnJouerCarte.textContent = "Passer le tour";
+
+        attacherListenersCartes();
+    }
+
+    function attacherListenersCartes() {
+        const maMain = document.getElementById("maMain");
+        if (!maMain) return;
+
+        const cartes = maMain.getElementsByTagName("li");
+        const btnJouerCarte = document.getElementById("btnJouerCarte");
+
+        for (let i = 0; i < cartes.length; i++) {
+            const nouvelleCarteLi = cartes[i].cloneNode(true);
+            cartes[i].parentNode.replaceChild(nouvelleCarteLi, cartes[i]);
+
+            nouvelleCarteLi.addEventListener("click", function () {
+                this.classList.toggle("selectionne");
+
+                // Mettre à jour le texte du bouton
+                if (btnJouerCarte) {
+                    const cartesSelectionnees = document.querySelectorAll("#maMain li.selectionne");
+                    if (cartesSelectionnees.length > 0) {
+                        btnJouerCarte.textContent = "Jouer la carte";
+                    } else {
+                        btnJouerCarte.textContent = "Passer le tour";
+                    }
+                }
+            });
+        }
+    }
 
     sock.on("coup_valide", function () {
         // Désélectionner toutes les cartes
@@ -305,38 +244,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sock.on("a_toi", function (data) {
         console.log(data.message);
-
+        alert(data.message);
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
-
-        // Bannière selon le contexte
-        if (data.message.includes("Nouveau tour")) {
-            afficherBanniere("🎯 Nouveau tour !", "Jouez 1 carte pour démarrer", "premier-tour");
-            afficherToast("C'est à vous ! Nouveau tour commence.", "info", 3000);
-        } else if (data.message.includes("Nouvelle manche")) {
-            afficherBanniere("🎲 Nouvelle manche !", "Vous commencez - Jouez 1 carte", "premier-tour");
-            afficherToast("Nouvelle manche ! Vous commencez.", "succes", 3000);
-        } else if (data.message.includes("commencez")) {
-            afficherBanniere("🎮 Vous commencez !", "Jouez votre première carte", "mon-tour");
-        } else {
-            afficherBanniere("🎯 À votre tour !", "Sélectionnez vos cartes", "mon-tour");
-        }
-
         jouerUneCarte();
     });
 
     sock.on("a_l_autre", function (data) {
         console.log(data.message);
-
+        alert(data.message);
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
-
-        // Trouver qui joue
-        const joueurCourant = data.nbCartesAdversaires.find((adv) => adv.estCourant);
-        const pseudoJoueur = joueurCourant ? joueurCourant.pseudo : "Un adversaire";
-
-        afficherBanniere(`⏳ Tour de ${pseudoJoueur}`, "Attendez votre tour...", "tour-autre");
-
         const btn = document.getElementById("btnJouerCarte");
         if (btn) btn.style.display = "none";
     });
@@ -360,9 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btnEnvoyerCarteTas.disabled = true;
 
         console.log("Sélectionner une carte dans le tas :", tasCartes);
-
-        afficherBanniere("🃏 Sélectionnez une carte", "Choisissez une carte dans le tas", "selection-tas");
-        afficherToast("Sélectionnez une carte dans le tas pour continuer", "info", 4000);
+        alert("C'est à vous de sélectionner une carte dans le tas.");
 
         let maCarte;
 
@@ -402,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         btnEnvoyerCarteTas.addEventListener("click", function () {
             if (!maCarte) {
-                afficherToast("Veuillez sélectionner une carte du tas.", "warning");
+                alert("Veuillez sélectionner une carte du tas.");
                 return;
             }
             sock.emit("carte_dans_tas_selectionnee", maCarte);
