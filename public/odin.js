@@ -323,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btnEnvoyerCarteTas.disabled = true;
 
         console.log("Sélectionner une carte dans le tas :", tasCartes);
-        alert("C'est à vous de sélectionner une carte dans le tas.");
+        afficherNotification("C'est à vous de sélectionner une carte dans le tas.", "info");
 
         let maCarte;
 
