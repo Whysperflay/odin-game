@@ -235,7 +235,7 @@ io.on("connection", (socket) => {
                 });
             } else {
                 parties[partie].joueurs[i].socket.emit("a_l_autre", {
-                    message: "Démarrage de la partie. En attente du tour de l'adversaire.",
+                    message: "Démarrage de la partie. En attente du tour de " + parties[partie].joueurs[parties[partie].courant].getPseudo() + ".",
                     tasCartes: parties[partie].tasCartes,
                     nbCartesAdversaires: nbCartesAdversaires,
                 });
@@ -503,7 +503,7 @@ io.on("connection", (socket) => {
         for (let i = 0; i < 3; i++) {
             if (i !== parties[partie].courant) {
                 parties[partie].joueurs[i].socket.emit("a_l_autre", {
-                    message: "En attente du tour de l'adversaire.",
+                    message: "En attente du tour de " + parties[partie].joueurs[parties[partie].courant].getPseudo() + ".",
                     tasCartes: parties[partie].tasCartes,
                     nbCartesAdversaires: nbCartesAdversaires,
                 });
@@ -568,7 +568,7 @@ io.on("connection", (socket) => {
         for (let i = 0; i < 3; i++) {
             if (i !== parties[partie].courant) {
                 parties[partie].joueurs[i].socket.emit("a_l_autre", {
-                    message: "Nouveau tour. En attente...",
+                    message: "Nouveau tour. En attente de " + parties[partie].joueurs[parties[partie].courant].getPseudo() + ".",
                     tasCartes: [],
                     nbCartesAdversaires: nbCartesAdversaires,
                 });
@@ -694,7 +694,7 @@ io.on("connection", (socket) => {
                 });
             } else {
                 parties[partie].joueurs[i].socket.emit("a_l_autre", {
-                    message: "Nouvelle manche. En attente...",
+                    message: "Nouvelle manche. En attente de " + parties[partie].joueurs[parties[partie].courant].getPseudo() + ".",
                     tasCartes: [],
                     nbCartesAdversaires: nbCartesAdversaires,
                 });
