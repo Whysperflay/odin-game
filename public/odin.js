@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // socket ouverte vers le serveur
     let sock = io.connect();
 
+    // ******************************************************
+    // GESTION DU PSEUDO ET DEMARRAGE DE LA PARTIE
+    // ******************************************************
     const inputPseudo = document.getElementById("inputPseudo");
     const btnDemarrer = document.getElementById("btnDemarrer");
 
@@ -45,6 +48,10 @@ document.addEventListener("DOMContentLoaded", function () {
         inputPseudo.disabled = true;
     });
 
+    // ******************************************************
+    // GESTION DES ÉVÉNEMENTS DU JEU
+    // ******************************************************
+
     /**
      * Affichage message en attente d'adversaire
      * @param {string} message
@@ -55,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Affichage message erreur
     sock.on("erreur", function (message) {
-        alert("Erreur : " + message);
+        afficherNotification("Erreur : " + message, "info");
         btnDemarrer.disabled = false;
         inputPseudo.disabled = false;
     });
@@ -103,8 +110,43 @@ document.addEventListener("DOMContentLoaded", function () {
         // ajouter la section dans <main> ou dans body si absent
         const container = document.querySelector("main") || document.body;
         container.appendChild(mainDiv);
+
+        // crée l'écran de notification
+        if (!document.getElementById("notification")) {
+            const notificationDiv = document.createElement("div");
+            notificationDiv.id = "notification";
+            const p1 = document.createElement("p");
+            p1.textContent = "Ligne 1 de la notification";
+            notificationDiv.appendChild(p1);
+            const p2 = document.createElement("p");
+            p2.textContent = "Ligne 2 de la notification";
+            notificationDiv.appendChild(p2);
+            container.appendChild(notificationDiv);
+        }
     });
 
+    /**
+     * Affiche le message de notification
+     * @param {String} message
+     * @param {string} type
+     */
+    function afficherNotification(message, type) {
+        let notificationDiv = document.getElementById("notification");
+        if (type === "tour") {
+            // vide les 2 lignes
+            const pElements = notificationDiv.getElementsByTagName("p");
+            for (let p of pElements) {
+                p.textContent = "";
+            }
+            // selectionne la première ligne
+            const p1 = pElements[0];
+            p1.textContent = message;
+        } else if (type === "info") {
+            // selectionne la deuxième ligne
+            const p2 = pElements[1];
+            p2.textContent = message;
+        }
+    }
     function jouerUneCarte() {
         let btnJouerCarte = document.getElementById("btnJouerCarte");
 
@@ -247,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sock.on("a_toi", function (data) {
         console.log(data.message);
-        alert(data.message);
+        afficherNotification(data.message, "tour");
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
         jouerUneCarte();
@@ -255,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sock.on("a_l_autre", function (data) {
         console.log(data.message);
-        alert(data.message);
+        afficherNotification(data.message, "tour");
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
         const btn = document.getElementById("btnJouerCarte");
@@ -321,7 +363,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         btnEnvoyerCarteTas.addEventListener("click", function () {
             if (!maCarte) {
-                alert("Veuillez sélectionner une carte du tas.");
+                afficherNotification("Veuillez sélectionner une carte du tas.", "info");
                 return;
             }
             sock.emit("carte_dans_tas_selectionnee", maCarte);
