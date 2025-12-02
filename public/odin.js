@@ -132,9 +132,9 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     function afficherNotification(message, type) {
         let notificationDiv = document.getElementById("notification");
+        const pElements = notificationDiv.getElementsByTagName("p");
         if (type === "tour") {
             // vide les 2 lignes
-            const pElements = notificationDiv.getElementsByTagName("p");
             for (let p of pElements) {
                 p.textContent = "";
             }
