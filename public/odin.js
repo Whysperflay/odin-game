@@ -386,6 +386,10 @@ document.addEventListener("DOMContentLoaded", function () {
     sock.on("fin_manche", function (data) {
         console.log("Fin de la manche :", data.nbManche);
 
+        // cacher le main
+        const main = document.querySelector("main");
+        if (main) main.style.display = "none";
+
         // Afficher les infos adversaires envoyées par le serveur
         if (data.nbCartesAdversaires) {
             afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
@@ -444,6 +448,9 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
             scoreMancheDiv.remove();
         }, 3000);
+
+        // Réafficher le main
+        if (main) main.style.display = "block";
     });
 
     sock.on("fin_partie", function (data) {
