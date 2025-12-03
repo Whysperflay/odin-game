@@ -439,7 +439,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Message
         const message = document.createElement("p");
         message.className = "message-attente";
-        message.textContent = "Nouvelle manche dans 3 secondes...";
+        message.textContent = "Nouvelle manche dans 10 secondes...";
         scoreMancheDiv.appendChild(message);
 
         document.body.appendChild(scoreMancheDiv);
@@ -447,10 +447,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Supprimer après 3 secondes
         setTimeout(() => {
             scoreMancheDiv.remove();
+            // Réafficher le main
+            if (main) main.style.display = "flex";
         }, 10000);
-
-        // Réafficher le main
-        if (main) main.style.display = "flex";
     });
 
     sock.on("fin_partie", function (data) {
