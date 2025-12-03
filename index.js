@@ -614,6 +614,7 @@ io.on("connection", (socket) => {
                 scores: scoresPartie,
                 nbManche: parties[partie].nbManches + 1,
                 nbCartesAdversaires: nbCartesAdversaires,
+                nbManchesMax: NB_MANCHES_MAX,
             });
         }
 

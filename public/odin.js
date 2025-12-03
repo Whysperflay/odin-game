@@ -404,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
         scoreMancheDiv.id = "scoreManche";
 
         const titre = document.createElement("h2");
-        titre.textContent = `Fin de la manche ${data.nbManche} / ${NB_MANCHES_MAX || 5}`;
+        titre.textContent = `Fin de la manche ${data.nbManche} / ${data.nbManchesMax}`;
         scoreMancheDiv.appendChild(titre);
 
         // Tableau des scores
@@ -447,10 +447,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // Supprimer après 3 secondes
         setTimeout(() => {
             scoreMancheDiv.remove();
-        }, 3600000);
+        }, 10000);
 
         // Réafficher le main
-        if (main) main.style.display = "block";
+        if (main) main.style.display = "flex";
     });
 
     sock.on("fin_partie", function (data) {
