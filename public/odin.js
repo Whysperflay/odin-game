@@ -447,7 +447,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Supprimer après 3 secondes
         setTimeout(() => {
             scoreMancheDiv.remove();
-        }, 3000);
+        }, 3600000);
 
         // Réafficher le main
         if (main) main.style.display = "block";
