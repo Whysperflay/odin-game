@@ -182,15 +182,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 if (cartesJouees.length > 0) {
-                    message = "Voulez-vous jouer:\n";
+                    let message = "Voulez-vous jouer:\n";
                     for (let carte of cartesJouees) {
                         message += `- ${carte.valeur} de ${carte.couleur}\n`;
                     }
                     message += "?";
-                }
-                if (confirm(message)) {
-                    console.log("Cartes jouées :", cartesJouees);
-                    sock.emit("jouer_carte", cartesJouees);
+
+                    if (confirm(message)) {
+                        console.log("Cartes jouées :", cartesJouees);
+                        sock.emit("jouer_carte", cartesJouees);
+                    }
                 }
             });
         }
