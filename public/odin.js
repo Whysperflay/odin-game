@@ -92,10 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
         mainDiv.id = "maMain";
 
         const ul = document.createElement("ul");
-        ul.style.listStyle = "none";
-        ul.style.padding = "0";
-        ul.style.display = "flex";
-        ul.style.gap = "10px";
 
         for (let carte of cartes) {
             const li = document.createElement("li");
@@ -147,6 +143,10 @@ document.addEventListener("DOMContentLoaded", function () {
             p2.textContent = message;
         }
     }
+
+    /**
+     * Permet de jouer une carte
+     */
     function jouerUneCarte() {
         let btnJouerCarte = document.getElementById("btnJouerCarte");
 
@@ -182,6 +182,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 if (cartesJouees.length > 0) {
+                    message = "Voulez-vous jouer:\n";
+                    for (let carte of cartesJouees) {
+                        message += `- ${carte.valeur} de ${carte.couleur}\n`;
+                    }
+                    message += "?";
+                }
+                if (confirm(message)) {
                     console.log("Cartes jouées :", cartesJouees);
                     sock.emit("jouer_carte", cartesJouees);
                 }
