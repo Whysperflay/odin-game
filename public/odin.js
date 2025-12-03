@@ -97,7 +97,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const li = document.createElement("li");
             const valeur = carte.valeur !== undefined ? carte.valeur : carte[0];
             const couleur = carte.couleur !== undefined ? carte.couleur : carte[1];
-            li.textContent = `${valeur} de ${couleur}`;
+            const img = document.createElement("img");
+            img.src = `images/${couleur}_${valeur}.png`;
+            console.log(img.src);
+            img.alt = `${valeur} de ${couleur}`;
+            li.appendChild(img);
             ul.appendChild(li);
         }
 
@@ -163,8 +167,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 for (let i = 0; i < cartes.length; i++) {
                     if (cartes[i].classList.contains("selectionne")) {
-                        const carteTexte = cartes[i].textContent;
-                        const [valeurStr, , couleur] = carteTexte.split(" ");
+                        const img = cartes[i].querySelector("img");
+                        const alt = img.alt;
+                        const [valeurStr, , couleur] = alt.split(" ");
                         const valeur = parseInt(valeurStr);
                         cartesJouees.push({ valeur, couleur });
                     }
@@ -261,7 +266,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const ul = document.createElement("ul");
         for (let carte of tasTrié) {
             const li = document.createElement("li");
-            li.textContent = `${carte.valeur} de ${carte.couleur}`;
+            const img = document.createElement("img");
+            img.src = `images/${carte.couleur}_${carte.valeur}.png`;
+            console.log(img.src);
+            img.alt = `${carte.valeur} de ${carte.couleur}`;
+            li.appendChild(img);
             ul.appendChild(li);
         }
         tasDiv.appendChild(ul);
@@ -352,8 +361,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 this.classList.add("selectionneTas");
 
-                const carteTexte = this.textContent;
-                const [valeurStr, , couleur] = carteTexte.split(" ");
+                const img = this.querySelector("img");
+                const alt = img.alt;
+                const [valeurStr, , couleur] = alt.split(" ");
                 const valeur = parseInt(valeurStr);
                 maCarte = { valeur, couleur };
                 console.log("Carte du tas sélectionnée :", maCarte.valeur, maCarte.couleur);

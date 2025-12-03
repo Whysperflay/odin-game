@@ -266,7 +266,6 @@ main {
 }
 
 #maMain ul li {
-    padding: 12px 18px;
     border: 2px solid #00cccc;
     border-radius: 10px;
     cursor: pointer;
@@ -274,6 +273,11 @@ main {
     font-weight: 500;
     min-width: 80px;
     text-align: center;
+}
+
+#maMain ul li img {
+    width: 75px;
+    height: 150px;
 }
 
 #maMain ul li:hover {
@@ -293,19 +297,28 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 150px;
-    height: 200px;
     border: 3px dashed #667eea;
     border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    min-width: 85px;
+    min-height: 160px;
 }
 
 #tasCartes li {
     cursor: pointer;
     transition: all 0.3s ease;
+    display: inline-block;
+}
+
+#tasCartes li img {
+    width: 75px;
+    height: 150px;
+    margin-right: 5px;
+    margin-left: 5px;
 }
 
 #tasCartes li:hover {
@@ -375,7 +388,6 @@ footer {
 }
 
 #btnJouerCarte {
-    margin-left: 20px;
     padding: 10px 20px;
     font-size: 1em;
     font-weight: bold;
@@ -388,7 +400,7 @@ footer {
     text-transform: uppercase;
     letter-spacing: 1px;
     position: fixed;
-    bottom: 170px;
+    bottom: 275px;
 }
 
 #btnJouerCarte:hover {
@@ -398,7 +410,6 @@ footer {
 
 /* Bouton pour sélectionner carte du tas */
 #btnEnvoyerCarteTas {
-    margin-left: 20px;
     padding: 10px 20px;
     font-size: 1em;
     font-weight: bold;
@@ -411,7 +422,7 @@ footer {
     text-transform: uppercase;
     letter-spacing: 1px;
     position: fixed;
-    bottom: 170px;
+    bottom: 275px;
 }
 
 #btnEnvoyerCarteTas:hover {
@@ -655,4 +666,23 @@ footer {
 #notification p {
     margin: 10px 0;
     font-weight: 500;
+}
+
+#btnTri {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(10deg, #005f5f 0%, #00cccc 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    height: max-content;
+    position: inherit;
+    width: max-content;
+    left: 105%;
+    top: 40%;
 }
