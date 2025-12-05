@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // socket ouverte vers le serveur
+    /** @type {Object} Socket.io pour la communication avec le serveur */
     let sock = io.connect();
 
     // ******************************************************
@@ -66,8 +66,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    /** @type {string} Pseudo du joueur actuel, stocké après la connexion */
     let monPseudo = "";
-    // Clic sur le bouton démarrer
+
+    /**
+     * Gestion du clic sur le bouton de démarrage
+     * Valide le pseudo et envoie la demande de connexion au serveur
+     */
     btnDemarrer.addEventListener("click", function () {
         let pseudo = inputPseudo.value;
         // verification du pseudo
@@ -104,21 +109,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // ******************************************************
 
     /**
-     * Affichage message en attente d'adversaire
-     * @param {string} message
+     * Affiche un message d'attente pendant la recherche d'adversaires
+     * Met à jour le texte du bouton de démarrage
+     * @param {string} message - Message d'attente à afficher
      */
     sock.on("en_attente", function (message) {
         btnDemarrer.innerHTML = message;
     });
 
-    // Affichage message erreur
+    /**
+     * Affiche un message d'erreur et réactive les champs de connexion si nécessaire
+     * Permet au joueur de réessayer en cas d'erreur de pseudo ou de jeu
+     * @param {string} message - Message d'erreur à afficher
+     */
     sock.on("erreur", function (message) {
         afficherNotification("Erreur : " + message, "info");
         btnDemarrer.disabled = false;
         inputPseudo.disabled = false;
     });
 
-    // déconnexion
+    /**
+     * Gère la déconnexion d'un adversaire
+     * Affiche un message d'alerte et recharge automatiquement la page après 10 secondes
+     * @param {string} message - Message indiquant quel joueur s'est déconnecté
+     */
     sock.on("deconnexion", function (message) {
         alert("Déconnexion : " + message + "\n\nRedirection dans 10 secondes...");
         setTimeout(() => {
@@ -126,7 +140,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 10000);
     });
 
-    // Réception de la main
+    // ******************************************************
+    // GESTION DES ÉVÉNEMENTS WEBSOCKET
+    // ******************************************************
+
+    /**
+     * Reçoit la main du joueur et l'affiche
+     * Crée les éléments HTML nécessaires (cartes, bouton de tri, zone de notification)
+     */
     sock.on("main", function (cartes) {
         console.log("Mes cartes :", cartes);
 
@@ -212,6 +233,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    /**
+     * Crée l'interface de la fenêtre des règles du jeu
+     * Génère tous les éléments HTML (titres, paragraphes, listes) expliquant les règles
+     */
     function creerRegle() {
         const titreRegle = document.createElement("h1");
         titreRegle.textContent = "COMMENT JOUER";
@@ -342,9 +367,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /**
-     * Affiche le message de notification
-     * @param {String} message
-     * @param {string} type
+     * Affiche un message dans la zone de notification
+     * @param {string} message - Le texte à afficher
+     * @param {string} type - Type de notification : "tour" (ligne 1) ou "info" (ligne 2)
      */
     function afficherNotification(message, type) {
         let notificationDiv = document.getElementById("notification");
@@ -365,7 +390,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /**
-     * Permet de jouer une carte
+     * Initialise et affiche le bouton pour jouer une carte ou passer son tour
+     * Gère la sélection des cartes et l'envoi au serveur
+     * Le texte du bouton change dynamiquement selon les cartes sélectionnées
      */
     function jouerUneCarte() {
         let btnJouerCarte = document.getElementById("btnJouerCarte");
@@ -423,6 +450,11 @@ document.addEventListener("DOMContentLoaded", function () {
         attacherListenersCartes();
     }
 
+    /**
+     * Attache les écouteurs d'événements aux cartes de la main du joueur
+     * Permet de sélectionner/désélectionner les cartes et met à jour le texte du bouton
+     * Utilise cloneNode pour éviter les listeners multiples
+     */
     function attacherListenersCartes() {
         const maMain = document.getElementById("maMain");
         if (!maMain) return;
@@ -450,6 +482,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    /**
+     * Gestion de la validation d'un coup par le serveur
+     * Désélectionne toutes les cartes et cache le bouton de jeu
+     */
     sock.on("coup_valide", function () {
         // Désélectionner toutes les cartes
         const maMain = document.getElementById("maMain");
@@ -467,6 +503,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    /**
+     * Affiche les cartes du tas au centre de l'écran
+     * Les cartes sont automatiquement triées par valeur décroissante
+     * @param {Array<Object>} tasCartes - Tableau des cartes à afficher dans le tas
+     */
     function afficherTas(tasCartes) {
         console.log("Tas de cartes sur la table :", tasCartes);
         let tasDiv = document.getElementById("tasCartes");
@@ -492,6 +533,12 @@ document.addEventListener("DOMContentLoaded", function () {
         tasDiv.appendChild(ul);
     }
 
+    /**
+     * Affiche les informations des adversaires (pseudo et nombre de cartes)
+     * Crée ou met à jour les zones d'affichage des adversaires en haut de l'écran
+     * @param {Array<Object>} adversaires - Liste des joueurs avec pseudo et nbCartes
+     * @param {string} monPseudo - Pseudo du joueur actuel (pour ne pas l'afficher comme adversaire)
+     */
     function afficherNbCartesAdversaires(adversaires, monPseudo) {
         // Supprimer les anciens adversaires
         document.querySelectorAll(".adversaire").forEach((el) => el.remove());
@@ -520,6 +567,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    /**
+     * Gestion de l'événement "C'est votre tour de jouer"
+     * Affiche la notification, met à jour l'interface et active le bouton de jeu
+     * Déclenche également la synthèse vocale
+     */
     sock.on("a_toi", function (data) {
         console.log(data.message);
         afficherNotification(data.message, "tour");
@@ -530,6 +582,10 @@ document.addEventListener("DOMContentLoaded", function () {
         jouerUneCarte();
     });
 
+    /**
+     * Gestion de l'événement "C'est le tour d'un autre joueur"
+     * Affiche la notification d'attente et cache le bouton de jeu
+     */
     sock.on("a_l_autre", function (data) {
         console.log(data.message);
         afficherNotification(data.message, "tour");
@@ -539,6 +595,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (btn) btn.style.display = "none";
     });
 
+    /**
+     * Gestion de la sélection d'une carte dans le tas après avoir joué
+     * Affiche le bouton de validation, rend les cartes du tas cliquables
+     * Le bouton est désactivé tant qu'aucune carte n'est sélectionnée
+     */
     sock.on("selectionner_carte_dans_tas", function (tasCartes) {
         // Cacher le bouton btnJouerCarte si visible
         const btnJouerCarte = document.getElementById("btnJouerCarte");
@@ -611,6 +672,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    /**
+     * Gestion de la fin de manche
+     * Affiche l'écran de scores avec le tableau des joueurs et leurs points
+     * Cache temporairement la zone de jeu pendant 10 secondes avant la nouvelle manche
+     */
     sock.on("fin_manche", function (data) {
         console.log("Fin de la manche :", data.nbManche);
 
@@ -681,6 +747,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 10000);
     });
 
+    /**
+     * Gestion de la fin de partie
+     * Affiche l'écran final avec le gagnant, le classement et un bouton pour rejouer
+     * Crée une interface complète avec médailles et mise en évidence du joueur actuel
+     */
     sock.on("fin_partie", function (data) {
         console.log("Fin de la partie !");
         console.log("Gagnant(s) :", data.gagnants);
@@ -772,6 +843,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.body.appendChild(finPartieDiv);
     });
 
+    /**
+     * Utilise la synthèse vocale du navigateur pour lire un texte
+     * Annule toute lecture en cours avant de démarrer la nouvelle
+     * @param {string} texte - Le texte à lire à voix haute
+     */
     function parler(texte) {
         if ("speechSynthesis" in window) {
             window.speechSynthesis.cancel();
