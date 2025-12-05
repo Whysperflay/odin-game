@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // ******************************************************
     const inputPseudo = document.getElementById("inputPseudo");
     const btnDemarrer = document.getElementById("btnDemarrer");
-    const NB_MANCHES_MAX = 3;
 
     // Appuyer sur Entrée déclanche le clic sur le btnDemarrer
     inputPseudo.addEventListener("keypress", function (e) {
@@ -527,6 +526,7 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
         parler("C'est à votre tour de jouer.");
+
         jouerUneCarte();
     });
 

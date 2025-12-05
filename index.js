@@ -28,8 +28,8 @@ let parties = {};
 let compteur = 0;
 
 /**
- *  Suppression de la partie (réinit joueurs);
- *  @param partie
+ * Supprime une partie et libère les ressources associées
+ * @param {number} partie - L'identifiant numérique de la partie à supprimer
  */
 function supprimerPartie(partie) {
     console.log("Suppression de la partie " + partie);
@@ -40,33 +40,67 @@ function supprimerPartie(partie) {
  ***                      Gestion des websockets                    ***
  **********************************************************************/
 
+/** Nombre maximum de manches par partie */
 const NB_MANCHES_MAX = 3;
 
+/**
+ * Représente une carte du jeu
+ * @class
+ */
 class Carte {
+    /** @type {number} Valeur de la carte (1-9) */
     valeur;
+    /** @type {string} Couleur de la carte (Bleu, Rouge, Rose, Noir, Vert, Jaune) */
     couleur;
 
+    /**
+     * Crée une nouvelle carte
+     * @param {number} valeur - Valeur de la carte (1-9)
+     * @param {string} couleur - Couleur de la carte
+     */
     constructor(valeur, couleur) {
         this.valeur = valeur;
         this.couleur = couleur;
     }
 
+    /**
+     * Retourne une représentation textuelle de la carte
+     * @returns {string} Format "valeur de couleur"
+     */
     toString() {
         return this.valeur + " de " + this.couleur;
     }
 }
 
+/**
+ * Représente un joueur dans la partie
+ * @class
+ */
 class Joueur {
+    /** @type {Object} Socket.io du joueur */
     socket;
+    /** @type {Array<Carte>} Cartes en main du joueur */
     main = [];
+    /** @type {string} Pseudo du joueur */
     pseudo;
+    /** @type {number} Score cumulé du joueur */
     score = 0;
 
+    /**
+     * Crée un nouveau joueur
+     * @param {Object} socket - Socket.io du joueur
+     * @param {string} pseudo - Pseudo du joueur
+     */
     constructor(socket, pseudo) {
         this.socket = socket;
         this.pseudo = pseudo;
     }
 
+    /**
+     * Retire une carte de la main du joueur
+     * @param {Carte} carte - La carte à retirer
+     * @returns {boolean} true si la carte a été retirée, false sinon
+     */
     retirerCarte(carte) {
         const index = this.main.findIndex((c) => c.valeur === carte.valeur && c.couleur === carte.couleur);
         if (index > -1) {
@@ -76,14 +110,26 @@ class Joueur {
         return false;
     }
 
+    /**
+     * Ajoute une carte à la main du joueur
+     * @param {Carte} carte - La carte à ajouter
+     */
     ajouterCarte(carte) {
         this.main.push(carte);
     }
 
+    /**
+     * Ajoute plusieurs cartes à la main du joueur
+     * @param {Array<Carte>} cartes - Les cartes à ajouter
+     */
     ajouterCartes(cartes) {
         this.main.push(...cartes);
     }
 
+    /**
+     * Trie les cartes en main du joueur
+     * @param {boolean} couleur - Si true, trie par couleur puis valeur. Si false, trie par valeur uniquement
+     */
     trierMain(couleur) {
         if (couleur) {
             const ordreCouleurs = ["Bleu", "Rouge", "Rose", "Noir", "Vert", "Jaune"];
@@ -104,11 +150,20 @@ class Joueur {
             });
         }
     }
+
+    /**
+     * Trie la main et l'envoie au client via socket
+     */
     envoyerMain() {
         this.trierMain(true);
         this.socket.emit("main", this.main);
     }
 
+    /**
+     * Vérifie si le joueur possède toutes les cartes spécifiées
+     * @param {Array<Carte>} cartes - Les cartes à vérifier
+     * @returns {boolean} true si le joueur possède toutes les cartes, false sinon
+     */
     possedeCartes(cartes) {
         for (let carte of cartes) {
             const index = this.main.findIndex((c) => c.valeur === carte.valeur && c.couleur === carte.couleur);
@@ -119,28 +174,49 @@ class Joueur {
         return true;
     }
 
+    /**
+     * Retourne le nombre de cartes en main
+     * @returns {number} Nombre de cartes
+     */
     getNbCartes() {
         return this.main.length;
     }
 
+    /**
+     * Retourne le pseudo du joueur
+     * @returns {string} Pseudo du joueur
+     */
     getPseudo() {
         return this.pseudo;
     }
 
+    /**
+     * Retourne le score actuel du joueur
+     * @returns {number} Score du joueur
+     */
     getScore() {
         return this.score;
     }
 
+    /**
+     * Définit le score du joueur
+     * @param {number} score - Nouveau score du joueur
+     */
     setScore(score) {
         this.score = score;
     }
 }
 
+/**
+ * Gestion de la connexion d'un nouveau client via WebSocket
+ */
 io.on("connection", (socket) => {
     console.log("Un client est connecté : " + socket.id);
 
-    let index = -1; // -1 : en attente de partie, 0 ou 1 position dans le tableau de joueurs.
-    let partie = null; // numéro de partie à laquelle participe le joueur
+    /** @type {number} Index du joueur dans le tableau des joueurs (-1 = en attente de partie, 0-2 = position dans la partie) */
+    let index = -1;
+    /** @type {number|null} Numéro de la partie à laquelle participe le joueur */
+    let partie = null;
 
     /**
      *  Demande le démarrage d'une partie.
@@ -190,8 +266,8 @@ io.on("connection", (socket) => {
     });
 
     /**
-     * Démarre une partie
-     * @param {int} partie numéro de la partie
+     * Démarre une partie : crée et distribue le jeu de cartes, choisit le premier joueur
+     * @param {number} partie - Numéro de la partie à démarrer
      */
     function debutPartie(partie) {
         // Création du jeu de cartes
@@ -251,6 +327,10 @@ io.on("connection", (socket) => {
         console.log("Contenu de la partie " + partie + " :", parties[partie]);
     }
 
+    /**
+     * Gestion de la demande de tri des cartes du joueur
+     * @param {boolean} couleur - Si true, trie par couleur puis valeur. Si false, trie par valeur uniquement
+     */
     socket.on("trier_carte", function (couleur) {
         if (!parties[partie] || index === -1) {
             socket.emit("erreur", "Partie introuvable.");
@@ -262,8 +342,9 @@ io.on("connection", (socket) => {
     });
 
     /**
-     * Gestion du jeu - un joueur joue une carte
-     * @param {Array} carte tableau de carte jouée
+     * Gestion de l'action de jeu : un joueur joue une ou plusieurs cartes
+     * Vérifie la validité du coup selon les règles (premier tour, nombre de cartes, valeur, couleur)
+     * @param {Array<Object>} carte - Tableau de cartes jouées (peut être vide pour passer)
      */
     socket.on("jouer_carte", function (carte) {
         if (!parties[partie] || index === -1) {
@@ -304,7 +385,9 @@ io.on("connection", (socket) => {
     });
 
     /**
-     * Traite le cas où le joueur passe son tour
+     * Traite le cas où le joueur passe son tour (joue 0 carte)
+     * Vérifie qu'on n'est pas au premier tour, incrémente le compteur de passes
+     * Si 2 passes consécutives, déclenche la fin du tour
      */
     function traiterPasse() {
         if (parties[partie].premierTour) {
@@ -324,8 +407,9 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Traite le premier tour
-     * @param {Array<Carte>} cartesJouees
+     * Traite le premier tour de la manche
+     * Règles : jouer 1 carte OU toutes ses cartes (si même valeur ou couleur)
+     * @param {Array<Carte>} cartesJouees - Les cartes jouées par le joueur
      */
     function traiterPremierTour(cartesJouees) {
         // Vérification : 1 carte OU toutes les cartes
@@ -360,8 +444,10 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Traite un tour normal
-     * @param {Array<Carte>} cartesJouees
+     * Traite un tour normal (après le premier tour)
+     * Règles : jouer autant ou +1 carte que le tas, même valeur/couleur, valeur supérieure
+     * Si le joueur vide sa main, déclenche la fin de manche. Sinon, demande sélection dans le tas
+     * @param {Array<Carte>} cartesJouees - Les cartes jouées par le joueur
      */
     function traiterTourNormal(cartesJouees) {
         const nbCartesTas = parties[partie].tasCartes.length;
@@ -406,8 +492,9 @@ io.on("connection", (socket) => {
 
     /**
      * Vérifie que toutes les cartes ont la même couleur OU la même valeur
-     * @param {Array<Carte>} cartes
-     * @returns {boolean}
+     * Règle du jeu : quand on joue plusieurs cartes, elles doivent respecter cette contrainte
+     * @param {Array<Carte>} cartes - Les cartes à vérifier
+     * @returns {boolean} true si même couleur OU même valeur, false sinon
      */
     function verifierMemeCouleurOuValeur(cartes) {
         const valeurRef = cartes[0].valeur;
@@ -424,8 +511,9 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Retire les cartes de la main du joueur et envoie la main mise à jour
-     * @param {Array<Carte>} cartes
+     * Retire les cartes de la main du joueur et envoie la main mise à jour au client
+     * Fonction utilitaire pour éviter la duplication de code
+     * @param {Array<Carte>} cartes - Les cartes à retirer
      */
     function retirerCartes(cartes) {
         for (let carte of cartes) {
@@ -435,8 +523,8 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Passe au joueur suivant
-     * @param {number} partie - L'identifiant de la partie en cours
+     * Passe au joueur suivant dans l'ordre de rotation
+     * Envoie "a_toi" au joueur actif et "a_l_autre" aux autres joueurs
      */
     function passerAuJoueurSuivant() {
         parties[partie].courant = (parties[partie].courant + 1) % 3;
@@ -468,9 +556,10 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Transforme une carte brute en objet Carte
-     * @param {*} carteBrute
-     * @returns {Carte}
+     * Transforme une carte brute (objet simple du client) en instance de Carte
+     * Convertit la valeur en entier pour éviter les erreurs de type
+     * @param {Object} carteBrute - Objet avec propriétés valeur et couleur
+     * @returns {Carte} Instance de Carte créée
      */
     function transformerCarte(carteBrute) {
         return new Carte(parseInt(carteBrute.valeur), carteBrute.couleur);
@@ -490,7 +579,8 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Fin du tour
+     * Déclenche la fin du tour après 2 passes consécutives
+     * Vide le tas, réinitialise l'état, le dernier joueur actif recommence un nouveau tour
      */
     function finDuTour() {
         console.log("Fin du tour, tout le monde a passé sauf " + parties[partie].joueurs[parties[partie].dernierJoueurActif].pseudo);
@@ -533,7 +623,9 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Fin de manche - calcul des scores
+     * Déclenche la fin de la manche : calcule les scores, notifie les joueurs
+     * Incrémente le compteur de manches et vérifie si c'est la fin de partie
+     * Sinon, lance une nouvelle manche après 3 secondes
      */
     function finDeManche() {
         console.log("Fin de la manche " + (parties[partie].nbManches + 1));
@@ -592,7 +684,8 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Démarre une nouvelle manche
+     * Démarre une nouvelle manche : vide les mains, crée et distribue un nouveau jeu
+     * Le joueur suivant dans l'ordre commence cette nouvelle manche
      */
     function nouvelleManche() {
         console.log("Démarrage de la manche " + (parties[partie].nbManches + 1));
@@ -660,7 +753,8 @@ io.on("connection", (socket) => {
     }
 
     /**
-     * Fin de partie - annonce du gagnant
+     * Déclenche la fin de la partie : détermine le(s) gagnant(s), crée le classement
+     * Notifie tous les joueurs et supprime la partie après 10 secondes
      */
     function finDePartie() {
         console.log("Fin de la partie " + partie);
@@ -688,7 +782,8 @@ io.on("connection", (socket) => {
     }
 
     /**
-     *  Gestion des déconnexions
+     * Gestion de la déconnexion d'un joueur
+     * Notifie les autres joueurs de la partie et supprime la partie en cours
      */
     socket.on("disconnect", function () {
         console.log("Déconnexion du joueur " + socket.id);
