@@ -280,7 +280,7 @@ main {
     height: 150px;
 }
 #maMain ul li:hover {
-    transform: translateY(-5px);
+    transform: translateY(-20px);
     box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
     background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
     color: white;

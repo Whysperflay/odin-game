@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("boutonCommentJouer inexistant");
         const boutonCommentJouer = document.createElement("button");
         boutonCommentJouer.id = "btnCommentJouer";
-        boutonCommentJouer.textContent = "Comment Jouer";
+        boutonCommentJouer.textContent = "?";
         console.log("boutonCommentJouer créé");
         this.body.appendChild(boutonCommentJouer);
         console.log("boutonCommentJouer ajouté à body");
