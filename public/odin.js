@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ******************************************************
     const inputPseudo = document.getElementById("inputPseudo");
     const btnDemarrer = document.getElementById("btnDemarrer");
+    const NB_MANCHES_MAX = 3;
 
     // Appuyer sur Entrée déclanche le clic sur le btnDemarrer
     inputPseudo.addEventListener("keypress", function (e) {
@@ -14,6 +15,57 @@ document.addEventListener("DOMContentLoaded", function () {
             btnDemarrer.click();
         }
     });
+
+    //création de la fenêtre des règles du jeu
+    const overlay = document.createElement("div");
+    overlay.id = "overlayhidden";
+    const fenRegle = document.createElement("div");
+    fenRegle.id = "regleshidden";
+    creerRegle();
+    document.body.appendChild(overlay);
+    document.body.appendChild(fenRegle);
+
+    //création bouton Comment Jouer
+    const boutonCommentJouer = document.getElementById("btnCommentJouer");
+    if (!boutonCommentJouer) {
+        console.log("boutonCommentJouer inexistant");
+        const boutonCommentJouer = document.createElement("button");
+        boutonCommentJouer.id = "btnCommentJouer";
+        boutonCommentJouer.textContent = "Comment Jouer";
+        console.log("boutonCommentJouer créé");
+        this.body.appendChild(boutonCommentJouer);
+        console.log("boutonCommentJouer ajouté à body");
+
+        boutonCommentJouer.addEventListener("click", function () {
+            const croix = document.getElementById("croixRegle");
+            if (!croix) {
+                const croix = document.createElement("button");
+                croix.id = "croixRegle";
+                croix.textContent = "X";
+
+                overlay.id = "overlayvisible";
+                fenRegle.id = "reglesvisible";
+                fenRegle.appendChild(croix);
+
+                croix.addEventListener("click", function () {
+                    overlay.id = "overlayhidden";
+                    fenRegle.id = "regleshidden";
+                    croix.remove();
+                });
+
+                overlay.addEventListener("click", function () {
+                    if (event.target === overlay) {
+                        overlay.id = "overlayhidden";
+                        fenRegle.id = "regleshidden";
+                        const croix = document.getElementById("croixRegle");
+                        if (croix) {
+                            croix.remove();
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     let monPseudo = "";
     // Clic sur le bouton démarrer
@@ -83,9 +135,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const ecran = document.getElementById("ecranPseudo");
         if (ecran) ecran.remove();
 
-        //si ancienne main, la supprimer
+        //si ancienne main, la supprimer (mais sauvegarder l'état du bouton de tri)
         const ancienneMain = document.getElementById("maMain");
-        if (ancienneMain) ancienneMain.remove();
+        let texteBoutonTri = "Trier par valeur";
+        if (ancienneMain) {
+            const ancienBoutonTri = document.getElementById("btnTri");
+            if (ancienBoutonTri) {
+                texteBoutonTri = ancienBoutonTri.textContent;
+            }
+            ancienneMain.remove();
+        }
 
         //Créer une div pour afficher la main
         const mainDiv = document.createElement("div");
@@ -98,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const valeur = carte.valeur !== undefined ? carte.valeur : carte[0];
             const couleur = carte.couleur !== undefined ? carte.couleur : carte[1];
             const img = document.createElement("img");
-            img.src = `images/${couleur}_${valeur}.png`;
+            img.src = `./images/${couleur}_${valeur}.png`;
             console.log(img.src);
             img.alt = `${valeur} de ${couleur}`;
             li.appendChild(img);
@@ -123,7 +182,165 @@ document.addEventListener("DOMContentLoaded", function () {
             notificationDiv.appendChild(p2);
             container.appendChild(notificationDiv);
         }
+
+        //créer le bouton de tri
+        const boutonTri = document.getElementById("btnTri");
+        if (!boutonTri) {
+            const boutonTri = document.createElement("button");
+            boutonTri.id = "btnTri";
+            boutonTri.textContent = texteBoutonTri;
+            mainDiv.appendChild(boutonTri);
+            container.appendChild(mainDiv);
+
+            boutonTri.addEventListener("click", function () {
+                if (boutonTri.textContent.includes("couleur")) {
+                    sock.emit("trier_carte", true);
+                } else {
+                    sock.emit("trier_carte", false);
+                }
+
+                if (boutonTri.textContent == "Trier par valeur") {
+                    boutonTri.textContent = "Trier par couleur";
+                } else {
+                    boutonTri.textContent = "Trier par valeur";
+                }
+            });
+        }
+
+        const btnJouerCarte = document.getElementById("btnJouerCarte");
+        if (btnJouerCarte && btnJouerCarte.style.display !== "none") {
+            attacherListenersCartes();
+        }
     });
+
+    function creerRegle() {
+        const titreRegle = document.createElement("h1");
+        titreRegle.textContent = "COMMENT JOUER";
+        fenRegle.appendChild(titreRegle);
+        let h2 = document.createElement("h2");
+        h2.textContent = "Matériel du jeu";
+        fenRegle.appendChild(h2);
+        let p = document.createElement("p");
+        p.textContent = "54 carets numérotées de 1 à 9 en 6 couleurs";
+        fenRegle.appendChild(p);
+        h2 = document.createElement("h2");
+        h2.textContent = "But du jeu";
+        fenRegle.appendChild(h2);
+        p = document.createElement("p");
+        p.textContent = "Soyez le premier à vous défausser de toutes les cartes de votre main et à cumuler le moins de points à la fin de la partie.";
+        fenRegle.appendChild(p);
+        h2 = document.createElement("h2");
+        h2.textContent = "Mise en place";
+        fenRegle.appendChild(h2);
+        p = document.createElement("p");
+        p.textContent = "Au début de la partie, chaque joueur commence avec 0 points.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent = "Au début de chaque manche, 9 cartes seront prises au hasard dans le paquet et seront attribués à chaque joueur.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent = " Ainsi à chaque début de manche chaque joueur commence avec 9 cartes.";
+        fenRegle.appendChild(p);
+        h2 = document.createElement("h2");
+        h2.textContent = "Déroulement du jeu ";
+        fenRegle.appendChild(h2);
+        p = document.createElement("p");
+        p.textContent = "Le jeu se déroule sur plusieurs manches et celles-ci se divise en plusieurs tours.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent = "Au début d'un tour, la première personne à jouer doit poser une de ses cartes dans le tas.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent = "Puis, chacun peut dans son tour de jeu, soit:";
+        fenRegle.appendChild(p);
+        let ul = document.createElement("ul");
+        let li = document.createElement("li");
+        li.textContent = "Jouer une ou plusieurs de ses cartes";
+        ul.appendChild(li);
+        li = document.createElement("li");
+        li.textContent = "Passer son tour";
+        ul.appendChild(li);
+        fenRegle.appendChild(ul);
+        let h3 = document.createElement("h3");
+        h3.textContent = "Jouer une ou plusieurs de ses cartes";
+        fenRegle.appendChild(h3);
+        p = document.createElement("p");
+        p.textContent = "La valeur que vous posez doit être strictement supérieure à la valeur dans le tas.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent = "EXEMPLE : Si au centre il y a un 3, vous devez jouer 4 ou plus";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent = "Vous pouvez jouer le même nombre de cartes que le nombre de cartes dans le tas ou une carte de plus.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent =
+            "EXEMPLE : Sur une combinaison de 2 cartes, vous pouvez jouer une autre combinaison de 2 cartes ou une combinaison de 3 cartes, mais pas de combinaison de 4 cartes, ni une carte seule";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent =
+            "Si vous jouez un 2 et un 8 (de la même couleur donc), la valeur de cette combinaison est 82 et non pas 28. Si vous jouez un 2, un 4 et un 9 (toujours de la même couleur), la valeur est de 942.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent =
+            "Après avoir jouer une ou plusieurs cartes, vous devez récupérer une des cartes qui se trouvait dans le précédent tas. Ce qui signifie que:";
+        fenRegle.appendChild(p);
+        ul = document.createElement("ul");
+        li = document.createElement("li");
+        li.textContent = "S'il n'y avait qu'une seule carte, vous la récupérer";
+        ul.appendChild(li);
+        li = document.createElement("li");
+        li.textContent = "S'il y en avait plusieurs alors vous choisissez laquelle vous voulez récupérer";
+        ul.appendChild(li);
+        fenRegle.appendChild(ul);
+        h3 = document.createElement("h3");
+        h3.textContent = "Passer son tour";
+        fenRegle.appendChild(h3);
+        p = document.createElement("p");
+        p.textContent = "Si vous passez, vous ne posez pas de carte et c’est au tour de jeu du(de la) prochain(e) joueur(se)";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent = "NOTE : Même si vous passez, vous pourrez jouer à nouveau lors de votre prochain tour de jeu.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent =
+            "Si tout le monde passe son tour, le tour se termine, les cartes dans le tas se défausse. La dernière personne à avoir posé une carte entame un nouveau tour. Chacun garde les cartes qu’il a en main.";
+        fenRegle.appendChild(p);
+        h2 = document.createElement("h2");
+        h2.textContent = "FIN DE MANCHE";
+        fenRegle.appendChild(h2);
+        p = document.createElement("p");
+        p.textContent = "Une manche se termine dans deux cas :";
+        fenRegle.appendChild(p);
+        ul = document.createElement("ul");
+        li = document.createElement("li");
+        li.textContent =
+            "Si vous êtes la personne qui démarre un nouveau tour et si toutes les cartes que vous avez en main ont la même valeur ou la même couleur. Vous pouvez les jouer et la manche s’arrête. Sinon, jouez une seule carte normalement.";
+        ul.appendChild(li);
+        li = document.createElement("li");
+        li.textContent =
+            "À n’importe quel moment, si vous jouez une ou plusieurs cartes et si votre main est vide. Vous ne prenez pas de cartes dans le tas et la manche s'arrête.";
+        ul.appendChild(li);
+        fenRegle.appendChild(ul);
+        p = document.createElement("p");
+        p.textContent = "À la fin de chaque manche, vous marquez autant de points que le nombre de cartes qu'il vous reste en main.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent =
+            "Au début de la nouvelle manche, 9 cartes sont distribués à chaque joueur, le joueur ou la joueuse qui jouait anciennement après le vainqueur de la manche commence un nouveau tour en posant 1 carte.";
+        fenRegle.appendChild(p);
+        h2 = document.createElement("h2");
+        h2.textContent = "FIN DE LA PARTIE";
+        fenRegle.appendChild(h2);
+        p = document.createElement("p");
+        p.textContent =
+            "Dès qu'un joueur atteint le seuil de points définit au début de la partie (15 de base), alors la partie est terminée et le joueur ayant le moins de points remporte la partie.";
+        fenRegle.appendChild(p);
+        p = document.createElement("p");
+        p.textContent =
+            "Si la partie est définit en manche, alors ce sera le joueur ayant le moins de points à la fin de la dernière manche qui remportera la partie.";
+        fenRegle.appendChild(p);
+    }
 
     /**
      * Affiche le message de notification
@@ -267,7 +484,7 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let carte of tasTrié) {
             const li = document.createElement("li");
             const img = document.createElement("img");
-            img.src = `images/${carte.couleur}_${carte.valeur}.png`;
+            img.src = `./images/${carte.couleur}_${carte.valeur}.png`;
             console.log(img.src);
             img.alt = `${carte.valeur} de ${carte.couleur}`;
             li.appendChild(img);
@@ -454,9 +671,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.body.appendChild(scoreMancheDiv);
 
-        // Supprimer après 3 secondes
+        // Supprimer après 10 secondes
         setTimeout(() => {
             scoreMancheDiv.remove();
+
             // Réafficher le main
             if (main) main.style.display = "flex";
         }, 10000);

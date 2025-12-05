@@ -84,22 +84,28 @@ class Joueur {
         this.main.push(...cartes);
     }
 
-    trierMain() {
-        const ordreCouleurs = ["Bleu", "Rouge", "Rose", "Noir", "Vert", "Jaune"];
+    trierMain(couleur) {
+        if (couleur) {
+            const ordreCouleurs = ["Bleu", "Rouge", "Rose", "Noir", "Vert", "Jaune"];
 
-        this.main.sort((a, b) => {
-            const indexCouleurA = ordreCouleurs.indexOf(a.couleur);
-            const indexCouleurB = ordreCouleurs.indexOf(b.couleur);
+            this.main.sort((a, b) => {
+                const indexCouleurA = ordreCouleurs.indexOf(a.couleur);
+                const indexCouleurB = ordreCouleurs.indexOf(b.couleur);
 
-            if (indexCouleurA !== indexCouleurB) {
-                return indexCouleurA - indexCouleurB;
-            }
+                if (indexCouleurA !== indexCouleurB) {
+                    return indexCouleurA - indexCouleurB;
+                }
 
-            return b.valeur - a.valeur;
-        });
+                return b.valeur - a.valeur;
+            });
+        } else {
+            this.main.sort((a, b) => {
+                return b.valeur - a.valeur;
+            });
+        }
     }
     envoyerMain() {
-        this.trierMain();
+        this.trierMain(true);
         this.socket.emit("main", this.main);
     }
 
@@ -244,6 +250,16 @@ io.on("connection", (socket) => {
 
         console.log("Contenu de la partie " + partie + " :", parties[partie]);
     }
+
+    socket.on("trier_carte", function (couleur) {
+        if (!parties[partie] || index === -1) {
+            socket.emit("erreur", "Partie introuvable.");
+            return;
+        }
+
+        parties[partie].joueurs[index].trierMain(couleur);
+        parties[partie].joueurs[index].socket.emit("main", parties[partie].joueurs[index].main);
+    });
 
     /**
      * Gestion du jeu - un joueur joue une carte
