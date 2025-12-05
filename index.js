@@ -280,219 +280,159 @@ io.on("connection", (socket) => {
         const cartesJouees = carte.map(transformerCarte);
 
         // Vérifier que le joueur possède bien les cartes jouées
-        if (!parties[partie].joueurs[index].possedeCartes(cartesJouees) && cartesJouees.length > 0) {
+        if (cartesJouees.length > 0 && !parties[partie].joueurs[index].possedeCartes(cartesJouees)) {
             socket.emit("erreur", "Vous ne possédez pas toutes les cartes que vous essayez de jouer.");
             return;
         }
 
-        console.log("Le joueur " + parties[partie].joueurs[index].pseudo + " joue la carte :", cartesJouees);
+        console.log("Le joueur " + parties[partie].joueurs[index].pseudo + " joue :", cartesJouees);
 
-        // Gestion de la carte jouée
-        // Vérifier si c'est la première manche
+        // ========== CAS 1 : PASSE (0 carte) ==========
+        if (cartesJouees.length === 0) {
+            traiterPasse();
+            return;
+        }
+
+        // ========== CAS 2 : PREMIER TOUR ==========
         if (parties[partie].premierTour) {
-            console.log("Première manche - vérification de la carte jouée.");
-            console.log("Cartes jouées :", carte);
+            traiterPremierTour(cartesJouees);
+            return;
+        }
 
-            // Au premier tour, impossible de passer
-            if (carte.length === 0) {
-                socket.emit("erreur", "Vous devez jouer au moins une carte lors du premier tour.");
-                return;
-            }
+        // ========== CAS 3 : TOUR NORMAL ==========
+        traiterTourNormal(cartesJouees);
+    });
 
-            if (carte.length !== 1) {
-                // si c'est toutes les cartes qu'il lui reste
-                if (parties[partie].joueurs[index].getNbCartes() !== carte.length) {
-                    socket.emit(
-                        "erreur",
-                        "Vous devez jouer une carte lors de la première manche ou toutes vos cartes seulement si elles ont toute la même valeur ou la même couleur."
-                    );
-                    console.log("Carte jouée invalide : plusieurs cartes jouées ou aucune carte jouée lors de la première manche.");
-                    return;
-                }
-                // vérifier que toutes les cartes sont de la même valeur ou de la même couleur
-                const valeurRef = cartesJouees[0].valeur;
-                const couleurRef = cartesJouees[0].couleur;
-                let memeValeur = true;
-                let memeCouleur = true;
-                for (let i = 1; i < cartesJouees.length; i++) {
-                    if (cartesJouees[i].valeur !== valeurRef) {
-                        memeValeur = false;
-                    }
-                    if (cartesJouees[i].couleur !== couleurRef) {
-                        memeCouleur = false;
-                    }
-                }
-                if (!memeValeur && !memeCouleur) {
-                    socket.emit(
-                        "erreur",
-                        "Cartes jouées invalide. Lorsque vous jouez plusieurs cartes, elles doivent être de la même valeur ou de la même couleur."
-                    );
-                    return;
-                }
+    /**
+     * Traite le cas où le joueur passe son tour
+     */
+    function traiterPasse() {
+        if (parties[partie].premierTour) {
+            socket.emit("erreur", "Vous devez jouer au moins une carte lors du premier tour.");
+            return;
+        }
 
-                parties[partie].premierTour = false;
+        console.log(parties[partie].joueurs[index].getPseudo() + " passe son tour.");
+        parties[partie].passesConsecutives++;
 
-                for (let c of cartesJouees) {
-                    parties[partie].joueurs[index].retirerCarte(c);
-                }
-                parties[partie].joueurs[index].envoyerMain();
+        if (parties[partie].passesConsecutives === 2) {
+            console.log("Deux passes consécutives, fin du tour.");
+            finDuTour();
+        } else {
+            passerAuJoueurSuivant();
+        }
+    }
 
-                parties[partie].tasCartes = cartesJouees;
+    /**
+     * Traite le premier tour
+     * @param {Array<Carte>} cartesJouees
+     */
+    function traiterPremierTour(cartesJouees) {
+        // Vérification : 1 carte OU toutes les cartes
+        if (cartesJouees.length > 1 && cartesJouees.length !== parties[partie].joueurs[index].getNbCartes()) {
+            socket.emit(
+                "erreur",
+                "Vous devez jouer une carte lors de la première manche ou toutes vos cartes seulement si elles ont toute la même valeur ou la même couleur."
+            );
+            return;
+        }
 
-                finDeManche();
-                return;
-            }
+        // Vérification : si plusieurs cartes, même valeur OU même couleur
+        if (cartesJouees.length > 1 && !verifierMemeCouleurOuValeur(cartesJouees)) {
+            socket.emit("erreur", "Les cartes jouées doivent être de la même valeur ou de la même couleur.");
+            return;
+        }
 
-            parties[partie].premierTour = false;
+        // Retirer les cartes et mettre à jour le tas
+        retirerCartes(cartesJouees);
+        parties[partie].tasCartes = cartesJouees;
+        parties[partie].premierTour = false;
 
-            //retirer la carte au joueur
-            parties[partie].joueurs[index].retirerCarte(cartesJouees[0]);
-
-            // lui renvoyer sa nouvelle main
-            parties[partie].joueurs[index].envoyerMain();
-
-            // Mettre à jour le tas de cartes jouées
-            parties[partie].tasCartes = cartesJouees;
-
-            // compteur de passes
+        // Vérifier fin de manche
+        if (parties[partie].joueurs[index].getNbCartes() === 0) {
+            socket.emit("coup_valide");
+            finDeManche();
+        } else {
             parties[partie].passesConsecutives = 0;
             parties[partie].dernierJoueurActif = index;
-
-            // Passer au joueur suivant
             passerAuJoueurSuivant();
-            return;
         }
+    }
 
-        // aucune carte jouée, il passe son tour
-        if (carte.length === 0) {
-            console.log(parties[partie].joueurs[index].getPseudo() + " passe son tour.");
-
-            parties[partie].passesConsecutives++;
-
-            // si 2 passes consécutives fin du tour
-            if (parties[partie].passesConsecutives === 2) {
-                console.log("Deux passes consécutives, fin du tour.");
-                finDuTour();
-                return;
-            }
-
-            // passer au joueur suivant
-            passerAuJoueurSuivant();
-            return;
-        }
-
-        // si le nombre de cartes jouées n'est pas égal au nombre de cartes du tas ou au nombre de cartes du tas + 1
+    /**
+     * Traite un tour normal
+     * @param {Array<Carte>} cartesJouees
+     */
+    function traiterTourNormal(cartesJouees) {
         const nbCartesTas = parties[partie].tasCartes.length;
+
+        // Vérification : nombre de cartes = tas OU tas+1
         if (cartesJouees.length !== nbCartesTas && cartesJouees.length !== nbCartesTas + 1) {
-            console.log("Carte jouée invalide : nombre de cartes jouées incorrect.");
-            socket.emit("erreur", "Vous devez jouer " + nbCartesTas + " ou " + (nbCartesTas + 1) + " cartes.");
+            socket.emit("erreur", `Vous devez jouer ${nbCartesTas} ou ${nbCartesTas + 1} cartes.`);
             return;
         }
 
-        // si plusieurs cartes jouées, vérifier qu'elles sont toutes de la même valeur ou de la meme couleur
-        if (cartesJouees.length > 1) {
-            const valeurRef = cartesJouees[0].valeur;
-            const couleurRef = cartesJouees[0].couleur;
-            let memeValeur = true;
-            let memeCouleur = true;
-            for (let i = 1; i < cartesJouees.length; i++) {
-                if (cartesJouees[i].valeur !== valeurRef) {
-                    memeValeur = false;
-                }
-                if (cartesJouees[i].couleur !== couleurRef) {
-                    memeCouleur = false;
-                }
-            }
-            if (!memeValeur && !memeCouleur) {
-                console.log("Carte jouée invalide : les cartes jouées ne sont pas de la même valeur ou de la même couleur.");
-                socket.emit(
-                    "erreur",
-                    "Cartes jouées invalide. Lorsque vous jouez plusieurs cartes, elles doivent être de la même valeur ou de la même couleur."
-                );
-                return;
-            }
+        // Vérification : si plusieurs cartes, même couleur OU même valeur
+        if (cartesJouees.length > 1 && !verifierMemeCouleurOuValeur(cartesJouees)) {
+            socket.emit("erreur", "Les cartes jouées doivent être de la même valeur ou de la même couleur.");
+            return;
         }
 
-        // si la valeur des cartes jouées est inférieure à celle du tas
+        // Vérification : valeur > tas
         if (plusGrandeValeur(cartesJouees) <= plusGrandeValeur(parties[partie].tasCartes)) {
-            // si la valeur des cartes jouées est inférieure à celle du tas
-            console.log("Carte jouée invalide : valeur des cartes jouées inférieure à celle du joueur précédent.");
-            socket.emit("erreur", "Cartes jouées invalide. La valeur des cartes jouées doit être supérieure à celle du joueur précédent.");
+            socket.emit("erreur", "La valeur des cartes jouées doit être supérieure à celle du joueur précédent.");
             return;
         }
 
-        // Retirer les cartes jouées de la main du joueur
-        for (let c of cartesJouees) {
-            parties[partie].joueurs[index].retirerCarte(c);
-        }
+        // Retirer les cartes
+        retirerCartes(cartesJouees);
 
-        // Vérifier si le joueur a vidé sa main
+        // Vérifier fin de manche
         if (parties[partie].joueurs[index].getNbCartes() === 0) {
-            console.log("Le joueur " + parties[partie].joueurs[index].pseudo + " a vidé sa main !");
-
-            // Mettre à jour le tas avec les cartes jouées
             parties[partie].tasCartes = cartesJouees;
-
-            // Envoyer la main vide au joueur
-            parties[partie].joueurs[index].envoyerMain();
-
-            // Fin de manche directe, pas de sélection dans le tas
             socket.emit("coup_valide");
             finDeManche();
             return;
         }
 
-        // Le joueur a encore des cartes, il doit sélectionner une carte dans le tas
+        // Le joueur continue : sélection carte du tas
         parties[partie].passesConsecutives = 0;
         parties[partie].dernierJoueurActif = index;
         parties[partie].cartesEnCoursDejeu = cartesJouees;
 
-        // Envoyer la main mise à jour au joueur
-        parties[partie].joueurs[index].envoyerMain();
-
         socket.emit("coup_valide");
         socket.emit("selectionner_carte_dans_tas", parties[partie].tasCartes);
-    });
+    }
 
-    socket.on("carte_dans_tas_selectionnee", function (carteSelectionnee) {
-        if (!parties[partie] || index === -1) {
-            socket.emit("erreur", "Partie introuvable.");
-            return;
+    /**
+     * Vérifie que toutes les cartes ont la même couleur OU la même valeur
+     * @param {Array<Carte>} cartes
+     * @returns {boolean}
+     */
+    function verifierMemeCouleurOuValeur(cartes) {
+        const valeurRef = cartes[0].valeur;
+        const couleurRef = cartes[0].couleur;
+        let memeValeur = true;
+        let memeCouleur = true;
+
+        for (let i = 1; i < cartes.length; i++) {
+            if (cartes[i].valeur !== valeurRef) memeValeur = false;
+            if (cartes[i].couleur !== couleurRef) memeCouleur = false;
         }
 
-        const cartesJouees = parties[partie].cartesEnCoursDejeu;
+        return memeValeur || memeCouleur;
+    }
 
-        if (!cartesJouees) {
-            socket.emit("erreur", "Erreur : aucune carte en cours de jeu.");
-            return;
+    /**
+     * Retire les cartes de la main du joueur et envoie la main mise à jour
+     * @param {Array<Carte>} cartes
+     */
+    function retirerCartes(cartes) {
+        for (let carte of cartes) {
+            parties[partie].joueurs[index].retirerCarte(carte);
         }
-
-        // retirer la carte du tas
-        let carteTas = transformerCarte(carteSelectionnee);
-        console.log("carteTas :", carteTas);
-
-        const indexCarte = parties[partie].tasCartes.findIndex((c) => c.valeur === carteTas.valeur && c.couleur === carteTas.couleur);
-        if (indexCarte > -1) {
-            parties[partie].tasCartes.splice(indexCarte, 1);
-        } else {
-            socket.emit("erreur", "La carte sélectionnée n'est pas dans le tas.");
-            return;
-        }
-
-        // ajouter la carte du tas à la main du joueur
-        parties[partie].joueurs[index].ajouterCarte(carteTas);
         parties[partie].joueurs[index].envoyerMain();
-
-        // Mettre à jour le tas de cartes jouées
-        parties[partie].tasCartes = cartesJouees;
-
-        console.log("Nouveau tas de cartes :", parties[partie].tasCartes);
-
-        delete parties[partie].cartesEnCoursDejeu;
-
-        // passer au joueur suivant
-        passerAuJoueurSuivant();
-    });
+    }
 
     /**
      * Passe au joueur suivant
