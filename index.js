@@ -491,6 +491,57 @@ io.on("connection", (socket) => {
     }
 
     /**
+     * Gestion de la sélection d'une carte dans le tas après avoir joué
+     * Retire la carte du tas, l'ajoute à la main du joueur, met à jour le tas
+     * Passe au joueur suivant
+     * @param {Object} carteSelectionnee - Carte sélectionnée par le joueur dans le tas
+     */
+    socket.on("carte_dans_tas_selectionnee", function (carteSelectionnee) {
+        if (!parties[partie] || index === -1) {
+            socket.emit("erreur", "Partie introuvable.");
+            return;
+        }
+
+        const cartesJouees = parties[partie].cartesEnCoursDejeu;
+
+        if (!cartesJouees) {
+            socket.emit("erreur", "Erreur : aucune carte en cours de jeu.");
+            return;
+        }
+
+        if (index !== parties[partie].courant) {
+            socket.emit("erreur", "Ce n'est pas votre tour de jouer.");
+            return;
+        }
+
+        // retirer la carte du tas
+        let carteTas = transformerCarte(carteSelectionnee);
+        console.log("carteTas :", carteTas);
+
+        const indexCarte = parties[partie].tasCartes.findIndex((c) => c.valeur === carteTas.valeur && c.couleur === carteTas.couleur);
+        if (indexCarte > -1) {
+            parties[partie].tasCartes.splice(indexCarte, 1);
+        } else {
+            socket.emit("erreur", "La carte sélectionnée n'est pas dans le tas.");
+            return;
+        }
+
+        // ajouter la carte du tas à la main du joueur
+        parties[partie].joueurs[index].ajouterCarte(carteTas);
+        parties[partie].joueurs[index].envoyerMain();
+
+        // Mettre à jour le tas de cartes jouées
+        parties[partie].tasCartes = cartesJouees;
+
+        console.log("Nouveau tas de cartes :", parties[partie].tasCartes);
+
+        delete parties[partie].cartesEnCoursDejeu;
+
+        // passer au joueur suivant
+        passerAuJoueurSuivant();
+    });
+
+    /**
      * Vérifie que toutes les cartes ont la même couleur OU la même valeur
      * Règle du jeu : quand on joue plusieurs cartes, elles doivent respecter cette contrainte
      * @param {Array<Carte>} cartes - Les cartes à vérifier
@@ -679,7 +730,7 @@ io.on("connection", (socket) => {
                     // Vérifier que la partie existe encore
                     nouvelleManche();
                 }
-            }, 3000);
+            }, 10000);
         }
     }
 
