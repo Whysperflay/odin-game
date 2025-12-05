@@ -526,6 +526,7 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherNotification(data.message, "tour");
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
+        parler("C'est à votre tour de jouer.");
         jouerUneCarte();
     });
 
@@ -770,4 +771,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.body.appendChild(finPartieDiv);
     });
+
+    function parler(texte) {
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(texte);
+            utterance.lang = "fr-FR";
+            utterance.pitch = 1;
+            utterance.rate = 1;
+            utterance.volume = 1;
+
+            window.speechSynthesis.speak(utterance);
+        }
+    }
 });
