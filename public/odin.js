@@ -28,10 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
     boutonTTS.addEventListener("click", function () {
         if (TTSactive) {
             parler("Vous allez me manquer !");
-        } else {
-            parler("Vous m'avez manqué !");
         }
         TTSactive = !TTSactive;
+        if (TTSactive) {
+            parler("Vous m'avez manqué !");
+        }
         boutonTTS.textContent = TTSactive ? "TTS : ON" : "TTS : OFF";
     });
 
