@@ -19,9 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let TTSactive = true;
     // creation du bouton TTS
-    const boutonTTS = document.getElementById("btnTTS");
+    let boutonTTS = document.getElementById("btnTTS");
     if (!boutonTTS) {
-        const boutonTTS = document.createElement("button");
+        boutonTTS = document.createElement("button");
         boutonTTS.id = "btnTTS";
         boutonTTS.textContent = "TTS : ON";
         document.body.appendChild(boutonTTS);
@@ -47,20 +47,20 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(fenRegle);
 
     //création bouton Comment Jouer
-    const boutonCommentJouer = document.getElementById("btnCommentJouer");
+    let boutonCommentJouer = document.getElementById("btnCommentJouer");
     if (!boutonCommentJouer) {
         console.log("boutonCommentJouer inexistant");
-        const boutonCommentJouer = document.createElement("button");
+        boutonCommentJouer = document.createElement("button");
         boutonCommentJouer.id = "btnCommentJouer";
         boutonCommentJouer.textContent = "?";
         console.log("boutonCommentJouer créé");
-        this.body.appendChild(boutonCommentJouer);
+        document.body.appendChild(boutonCommentJouer);
         console.log("boutonCommentJouer ajouté à body");
 
         boutonCommentJouer.addEventListener("click", function () {
-            const croix = document.getElementById("croixRegle");
+            let croix = document.getElementById("croixRegle");
             if (!croix) {
-                const croix = document.createElement("button");
+                croix = document.createElement("button");
                 croix.id = "croixRegle";
                 croix.textContent = "X";
 
@@ -229,9 +229,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         //créer le bouton de tri
-        const boutonTri = document.getElementById("btnTri");
+        let boutonTri = document.getElementById("btnTri");
         if (!boutonTri) {
-            const boutonTri = document.createElement("button");
+            boutonTri = document.createElement("button");
             boutonTri.id = "btnTri";
             boutonTri.textContent = texteBoutonTri;
             mainDiv.appendChild(boutonTri);
