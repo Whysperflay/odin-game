@@ -1,5 +1,3 @@
-const { text } = require("express");
-
 document.addEventListener("DOMContentLoaded", function () {
     /** @type {Object} Socket.io pour la communication avec le serveur */
     let sock = io.connect();
