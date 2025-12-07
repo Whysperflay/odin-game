@@ -124,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     sock.on("erreur", function (message) {
         afficherNotification("Erreur : " + message, "info");
+        parler(message);
         btnDemarrer.disabled = false;
         inputPseudo.disabled = false;
     });
@@ -144,11 +145,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // GESTION DES ÉVÉNEMENTS WEBSOCKET
     // ******************************************************
 
+    let partieCommencee = false;
     /**
      * Reçoit la main du joueur et l'affiche
      * Crée les éléments HTML nécessaires (cartes, bouton de tri, zone de notification)
      */
     sock.on("main", function (cartes) {
+        partieCommencee = true;
         console.log("Mes cartes :", cartes);
 
         // enlever ou cacher l'écran de pseudo
@@ -245,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
         h2.textContent = "Matériel du jeu";
         fenRegle.appendChild(h2);
         let p = document.createElement("p");
-        p.textContent = "54 carets numérotées de 1 à 9 en 6 couleurs";
+        p.textContent = "54 cartes numérotées de 1 à 9 en 6 couleurs";
         fenRegle.appendChild(p);
         h2 = document.createElement("h2");
         h2.textContent = "But du jeu";
@@ -260,16 +263,16 @@ document.addEventListener("DOMContentLoaded", function () {
         p.textContent = "Au début de la partie, chaque joueur commence avec 0 points.";
         fenRegle.appendChild(p);
         p = document.createElement("p");
-        p.textContent = "Au début de chaque manche, 9 cartes seront prises au hasard dans le paquet et seront attribués à chaque joueur.";
+        p.textContent = "Au début de chaque manche, 9 cartes seront prises au hasard dans le paquet et seront attribuées à chaque joueur.";
         fenRegle.appendChild(p);
         p = document.createElement("p");
-        p.textContent = " Ainsi à chaque début de manche chaque joueur commence avec 9 cartes.";
+        p.textContent = "Au début de la nouvelle manche, 9 cartes sont distribuées à chaque joueur...";
         fenRegle.appendChild(p);
         h2 = document.createElement("h2");
         h2.textContent = "Déroulement du jeu ";
         fenRegle.appendChild(h2);
         p = document.createElement("p");
-        p.textContent = "Le jeu se déroule sur plusieurs manches et celles-ci se divise en plusieurs tours.";
+        p.textContent = "Le jeu se déroule sur plusieurs manches et celles-ci se divisent en plusieurs tours.";
         fenRegle.appendChild(p);
         p = document.createElement("p");
         p.textContent = "Au début d'un tour, la première personne à jouer doit poser une de ses cartes dans le tas.";
@@ -307,11 +310,11 @@ document.addEventListener("DOMContentLoaded", function () {
         fenRegle.appendChild(p);
         p = document.createElement("p");
         p.textContent =
-            "Après avoir jouer une ou plusieurs cartes, vous devez récupérer une des cartes qui se trouvait dans le précédent tas. Ce qui signifie que:";
+            "Après avoir joué une ou plusieurs cartes, vous devez récupérer une des cartes qui se trouvait dans le précédent tas. Ce qui signifie que:";
         fenRegle.appendChild(p);
         ul = document.createElement("ul");
         li = document.createElement("li");
-        li.textContent = "S'il n'y avait qu'une seule carte, vous la récupérer";
+        li.textContent = "S'il n'y avait qu'une seule carte, vous la récupérez";
         ul.appendChild(li);
         li = document.createElement("li");
         li.textContent = "S'il y en avait plusieurs alors vous choisissez laquelle vous voulez récupérer";
@@ -321,14 +324,14 @@ document.addEventListener("DOMContentLoaded", function () {
         h3.textContent = "Passer son tour";
         fenRegle.appendChild(h3);
         p = document.createElement("p");
-        p.textContent = "Si vous passez, vous ne posez pas de carte et c’est au tour de jeu du(de la) prochain(e) joueur(se)";
+        p.textContent = "Si vous passez, vous ne posez pas de carte et c'est au tour de jeu du(de la) prochain(e) joueur(se)";
         fenRegle.appendChild(p);
         p = document.createElement("p");
         p.textContent = "NOTE : Même si vous passez, vous pourrez jouer à nouveau lors de votre prochain tour de jeu.";
         fenRegle.appendChild(p);
         p = document.createElement("p");
         p.textContent =
-            "Si tout le monde passe son tour, le tour se termine, les cartes dans le tas se défausse. La dernière personne à avoir posé une carte entame un nouveau tour. Chacun garde les cartes qu’il a en main.";
+            "Si tout le monde passe son tour, le tour se termine, les cartes dans le tas se défaussent. La dernière personne à avoir posé une carte entame un nouveau tour. Chacun garde les cartes qu'il a en main.";
         fenRegle.appendChild(p);
         h2 = document.createElement("h2");
         h2.textContent = "FIN DE MANCHE";
@@ -339,11 +342,11 @@ document.addEventListener("DOMContentLoaded", function () {
         ul = document.createElement("ul");
         li = document.createElement("li");
         li.textContent =
-            "Si vous êtes la personne qui démarre un nouveau tour et si toutes les cartes que vous avez en main ont la même valeur ou la même couleur. Vous pouvez les jouer et la manche s’arrête. Sinon, jouez une seule carte normalement.";
+            "Si vous êtes la personne qui démarre un nouveau tour et si toutes les cartes que vous avez en main ont la même valeur ou la même couleur. Vous pouvez les jouer et la manche s'arrête. Sinon, jouez une seule carte normalement.";
         ul.appendChild(li);
         li = document.createElement("li");
         li.textContent =
-            "À n’importe quel moment, si vous jouez une ou plusieurs cartes et si votre main est vide. Vous ne prenez pas de cartes dans le tas et la manche s'arrête.";
+            "À n'importe quel moment, si vous jouez une ou plusieurs cartes et si votre main est vide. Vous ne prenez pas de cartes dans le tas et la manche s'arrête.";
         ul.appendChild(li);
         fenRegle.appendChild(ul);
         p = document.createElement("p");
@@ -351,18 +354,18 @@ document.addEventListener("DOMContentLoaded", function () {
         fenRegle.appendChild(p);
         p = document.createElement("p");
         p.textContent =
-            "Au début de la nouvelle manche, 9 cartes sont distribués à chaque joueur, le joueur ou la joueuse qui jouait anciennement après le vainqueur de la manche commence un nouveau tour en posant 1 carte.";
+            "Au début de la nouvelle manche, 9 cartes sont distribuées à chaque joueur, le joueur ou la joueuse qui jouait anciennement après le vainqueur de la manche commence un nouveau tour en posant 1 carte.";
         fenRegle.appendChild(p);
         h2 = document.createElement("h2");
         h2.textContent = "FIN DE LA PARTIE";
         fenRegle.appendChild(h2);
         p = document.createElement("p");
         p.textContent =
-            "Dès qu'un joueur atteint le seuil de points définit au début de la partie (15 de base), alors la partie est terminée et le joueur ayant le moins de points remporte la partie.";
+            "Dès qu'un joueur atteint le seuil de points défini au début de la partie (15 de base), alors la partie est terminée et le joueur ayant le moins de points remporte la partie.";
         fenRegle.appendChild(p);
         p = document.createElement("p");
         p.textContent =
-            "Si la partie est définit en manche, alors ce sera le joueur ayant le moins de points à la fin de la dernière manche qui remportera la partie.";
+            "Si la partie est définie en manche, alors ce sera le joueur ayant le moins de points à la fin de la dernière manche qui remportera la partie.";
         fenRegle.appendChild(p);
     }
 
@@ -849,6 +852,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * @param {string} texte - Le texte à lire à voix haute
      */
     function parler(texte) {
+        if (partieCommencee === false) return;
         if ("speechSynthesis" in window) {
             window.speechSynthesis.cancel();
 
