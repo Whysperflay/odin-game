@@ -383,7 +383,7 @@ footer {
 .selectionne {
     background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
     box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
-    color: white;
+    transform: translateY(-15px);
 }
 
 #btnJouerCarte {
