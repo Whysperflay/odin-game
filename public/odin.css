@@ -831,3 +831,27 @@ footer {
     font-size: 20px;
     font-weight: bold;
 }
+
+#btnTTS {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(10deg, #005f5f 0%, #00cccc 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    height: max-content;
+    position: fixed;
+    width: max-content;
+    left: 50px;
+    bottom: 70px;
+}
+
+#btnTTS:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}

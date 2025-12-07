@@ -1,3 +1,5 @@
+const { text } = require("express");
+
 document.addEventListener("DOMContentLoaded", function () {
     /** @type {Object} Socket.io pour la communication avec le serveur */
     let sock = io.connect();
@@ -13,6 +15,26 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.key === "Enter") {
             btnDemarrer.click();
         }
+    });
+
+    let TTSactive = true;
+    // creation du bouton TTS
+    const boutonTTS = document.getElementById("btnTTS");
+    if (!boutonTTS) {
+        const boutonTTS = document.createElement("button");
+        boutonTTS.id = "btnTTS";
+        boutonTTS.textContent = "TTS : ON";
+        document.body.appendChild(boutonTTS);
+    }
+
+    boutonTTS.addEventListener("click", function () {
+        if (TTSactive) {
+            parler("Vous allez me manquer !");
+        } else {
+            parler("Vous m'avez manqué !");
+        }
+        TTSactive = !TTSactive;
+        boutonTTS.textContent = TTSactive ? "TTS : ON" : "TTS : OFF";
     });
 
     //création de la fenêtre des règles du jeu
@@ -852,7 +874,8 @@ document.addEventListener("DOMContentLoaded", function () {
      * @param {string} texte - Le texte à lire à voix haute
      */
     function parler(texte) {
-        if (partieCommencee === false) return;
+        if (partieCommencee === false && texte !== "Vous allez me manquer !" && texte !== "Vous m'avez manqué !") return;
+        if (!TTSactive) return;
         if ("speechSynthesis" in window) {
             window.speechSynthesis.cancel();
 
