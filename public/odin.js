@@ -724,11 +724,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 afficherNotification("Veuillez sélectionner une carte du tas.", "info");
                 return;
             }
+            if (!confirm(`Voulez-vous récupérer la carte ${maCarte.valeur} de ${maCarte.couleur} du tas ?`)) {
+                return;
+            }
             sock.emit("carte_dans_tas_selectionnee", maCarte);
             console.log("Carte du tas envoyée :", maCarte.valeur, maCarte.couleur);
             phase = "attente";
             btnEnvoyerCarteTas.style.display = "none";
-            arrêterRappelVocal();
+            arreterRappelVocal();
 
             const cartesTas = document.querySelectorAll("#tasCartes li");
             cartesTas.forEach((el) => el.classList.remove("selectionneTas"));
@@ -739,9 +742,20 @@ document.addEventListener("DOMContentLoaded", function () {
      * Gestion de la fin de manche
      * Affiche l'écran de scores avec le tableau des joueurs et leurs points
      * Cache temporairement la zone de jeu pendant 10 secondes avant la nouvelle manche
+     * data : {nbManche, nbManchesMax, scores: [{pseudo, cartesRestantes, scoreTotal}], nbCartesAdversaires}
      */
     sock.on("fin_manche", function (data) {
         console.log("Fin de la manche :", data.nbManche);
+        // chercher qui a gagné la manche
+        let gagnantManche = null;
+        for (let score of data.scores) {
+            if (score.cartesRestantes === 0) {
+                gagnantManche = score.pseudo;
+                break;
+            }
+        }
+        console.log("Gagnant de la manche :", gagnantManche);
+        parler(`Fin de la manche ${data.nbManche}. ${gagnantManche} a gagné la manche.`);
 
         // cacher le main
         const main = document.querySelector("main");
