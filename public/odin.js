@@ -41,9 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     let TTSactive = true;
     function initialiserBoutonTTS() {
-        const boutonTTS = document.getElementById("btnTTS");
+        let boutonTTS = document.getElementById("btnTTS");
         if (!boutonTTS) {
-            const boutonTTS = document.createElement("button");
+            boutonTTS = document.createElement("button");
             boutonTTS.id = "btnTTS";
             boutonTTS.textContent = "TTS : ON";
             document.body.appendChild(boutonTTS);
