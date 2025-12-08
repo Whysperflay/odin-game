@@ -13,10 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // touche Enter
     document.addEventListener("keypress", function (e) {
         if (e.key === "Enter") {
-            if (e.target.tagName === "INPUT" && phase === "btnDemarrer") {
-                return;
-            }
-
             if (phase === "btnDemarrer") {
                 const btnDemarrer = document.getElementById("btnDemarrer");
                 if (btnDemarrer && !btnDemarrer.disabled) {
@@ -32,6 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (btnEnvoyerCarteTas && btnEnvoyerCarteTas.style.display !== "none") {
                     btnEnvoyerCarteTas.click();
                 }
+            } else {
+                console.log("Aucune action associée à la touche Enter en phase :", phase);
             }
         }
     });
