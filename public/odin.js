@@ -542,6 +542,7 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     sock.on("coup_valide", function () {
         phase = "attente";
+        arreterRappelVocal();
         // Désélectionner toutes les cartes
         const maMain = document.getElementById("maMain");
         if (maMain) {
@@ -622,6 +623,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    /** @type {number | null} ID de l'intervalle de rappel */
+    let intervalRappel = null;
     /**
      * Gestion de l'événement "C'est votre tour de jouer"
      * Affiche la notification, met à jour l'interface et active le bouton de jeu
@@ -632,8 +635,7 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherNotification(data.message, "tour");
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
-        parler("C'est à votre tour de jouer.");
-
+        demarrerRappelVocal("C'est à votre tour de jouer.");
         jouerUneCarte();
     });
 
@@ -646,6 +648,8 @@ document.addEventListener("DOMContentLoaded", function () {
         afficherNotification(data.message, "tour");
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
+        arreterRappelVocal();
+        phase = "attente";
         const btn = document.getElementById("btnJouerCarte");
         if (btn) btn.style.display = "none";
     });
@@ -676,6 +680,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Sélectionner une carte dans le tas :", tasCartes);
         afficherNotification("C'est à vous de sélectionner une carte dans le tas.", "info");
+        demarrerRappelVocal("Sélectionnez une carte dans le tas.");
 
         let maCarte;
 
@@ -723,6 +728,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Carte du tas envoyée :", maCarte.valeur, maCarte.couleur);
             phase = "attente";
             btnEnvoyerCarteTas.style.display = "none";
+            arrêterRappelVocal();
 
             const cartesTas = document.querySelectorAll("#tasCartes li");
             cartesTas.forEach((el) => el.classList.remove("selectionneTas"));
@@ -918,6 +924,30 @@ document.addEventListener("DOMContentLoaded", function () {
             utterance.volume = 1;
 
             window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    /**
+     * Démarre un rappel vocal qui se répète toutes les 10 secondes
+     * @param {string} message - Le message à répéter
+     */
+    function demarrerRappelVocal(message) {
+        arreterRappelVocal();
+        parler(message);
+
+        // répète toutes les 10 secondes
+        intervalRappel = setInterval(() => {
+            parler(message);
+        }, 10000);
+    }
+
+    /**
+     * Arrête le rappel vocal en cours
+     */
+    function arreterRappelVocal() {
+        if (intervalRappel !== null) {
+            clearInterval(intervalRappel);
+            intervalRappel = null;
         }
     }
 });
