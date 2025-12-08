@@ -8,33 +8,59 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputPseudo = document.getElementById("inputPseudo");
     const btnDemarrer = document.getElementById("btnDemarrer");
 
-    // Appuyer sur Entrée déclanche le clic sur le btnDemarrer
-    inputPseudo.addEventListener("keypress", function (e) {
+    let phase = "btnDemarrer";
+
+    // touche Enter
+    document.addEventListener("keypress", function (e) {
         if (e.key === "Enter") {
-            btnDemarrer.click();
+            if (e.target.tagName === "INPUT" && phase === "btnDemarrer") {
+                return;
+            }
+
+            if (phase === "btnDemarrer") {
+                const btnDemarrer = document.getElementById("btnDemarrer");
+                if (btnDemarrer && !btnDemarrer.disabled) {
+                    btnDemarrer.click();
+                }
+            } else if (phase === "btnJouerCarte") {
+                const btnJouerCarte = document.getElementById("btnJouerCarte");
+                if (btnJouerCarte && btnJouerCarte.style.display !== "none") {
+                    btnJouerCarte.click();
+                }
+            } else if (phase === "btnEnvoyerCarteTas") {
+                const btnEnvoyerCarteTas = document.getElementById("btnEnvoyerCarteTas");
+                if (btnEnvoyerCarteTas && btnEnvoyerCarteTas.style.display !== "none") {
+                    btnEnvoyerCarteTas.click();
+                }
+            }
         }
     });
 
+    /**
+     * Initialise le bouton de synthèse vocale
+     */
     let TTSactive = true;
-    // creation du bouton TTS
-    let boutonTTS = document.getElementById("btnTTS");
-    if (!boutonTTS) {
-        boutonTTS = document.createElement("button");
-        boutonTTS.id = "btnTTS";
-        boutonTTS.textContent = "TTS : ON";
-        document.body.appendChild(boutonTTS);
+    function initialiserBoutonTTS() {
+        const boutonTTS = document.getElementById("btnTTS");
+        if (!boutonTTS) {
+            const boutonTTS = document.createElement("button");
+            boutonTTS.id = "btnTTS";
+            boutonTTS.textContent = "TTS : ON";
+            document.body.appendChild(boutonTTS);
+        }
+
+        boutonTTS.addEventListener("click", function () {
+            if (TTSactive) {
+                parler("Vous allez me manquer !");
+            } else {
+                parler("Vous m'avez manqué !");
+            }
+            TTSactive = !TTSactive;
+            boutonTTS.textContent = TTSactive ? "TTS : ON" : "TTS : OFF";
+        });
     }
 
-    boutonTTS.addEventListener("click", function () {
-        if (TTSactive) {
-            parler("Vous allez me manquer !");
-        }
-        TTSactive = !TTSactive;
-        if (TTSactive) {
-            parler("Vous m'avez manqué !");
-        }
-        boutonTTS.textContent = TTSactive ? "TTS : ON" : "TTS : OFF";
-    });
+    initialiserBoutonTTS();
 
     //création de la fenêtre des règles du jeu
     const overlay = document.createElement("div");
@@ -112,12 +138,12 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Le pseudo ne doit pas dépasser 20 caractères.");
             inputPseudo.value = "";
             inputPseudo.focus();
-
             return;
         }
 
         // Envoi du pseudo au serveur pour démarrer une partie
         sock.emit("demarrer", pseudo);
+        phase = "attente";
         monPseudo = pseudo;
 
         // Désactiver les champs pseudo et bouton démarrer
@@ -146,8 +172,13 @@ document.addEventListener("DOMContentLoaded", function () {
     sock.on("erreur", function (message) {
         afficherNotification("Erreur : " + message, "info");
         parler(message);
-        btnDemarrer.disabled = false;
-        inputPseudo.disabled = false;
+
+        if (btnDemarrer && document.body.contains(btnDemarrer)) {
+            btnDemarrer.disabled = false;
+        }
+        if (inputPseudo && document.body.contains(inputPseudo)) {
+            inputPseudo.disabled = false;
+        }
     });
 
     /**
@@ -420,6 +451,7 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     function jouerUneCarte() {
         let btnJouerCarte = document.getElementById("btnJouerCarte");
+        phase = "btnJouerCarte";
 
         if (!btnJouerCarte) {
             btnJouerCarte = document.createElement("button");
@@ -511,6 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * Désélectionne toutes les cartes et cache le bouton de jeu
      */
     sock.on("coup_valide", function () {
+        phase = "attente";
         // Désélectionner toutes les cartes
         const maMain = document.getElementById("maMain");
         if (maMain) {
@@ -625,6 +658,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * Le bouton est désactivé tant qu'aucune carte n'est sélectionnée
      */
     sock.on("selectionner_carte_dans_tas", function (tasCartes) {
+        phase = "btnEnvoyerCarteTas";
         // Cacher le bouton btnJouerCarte si visible
         const btnJouerCarte = document.getElementById("btnJouerCarte");
         if (btnJouerCarte) btnJouerCarte.style.display = "none";
@@ -689,6 +723,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             sock.emit("carte_dans_tas_selectionnee", maCarte);
             console.log("Carte du tas envoyée :", maCarte.valeur, maCarte.couleur);
+            phase = "attente";
             btnEnvoyerCarteTas.style.display = "none";
 
             const cartesTas = document.querySelectorAll("#tasCartes li");
