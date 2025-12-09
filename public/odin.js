@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnDemarrer = document.getElementById("btnDemarrer");
 
     let phase = "btnDemarrer";
+    const mode = "PRODUCTION"; // PRODUCTION ou DEVELOPPEMENT
 
     // touche Enter
     document.addEventListener("keypress", function (e) {
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     btnEnvoyerCarteTas.click();
                 }
             } else {
-                console.log("Aucune action associée à la touche Enter en phase :", phase);
+                if (mode === "DEVELOPPEMENT") console.log("Aucune action associée à la touche Enter en phase :", phase);
             }
         }
     });
@@ -73,13 +74,13 @@ document.addEventListener("DOMContentLoaded", function () {
     //création bouton Comment Jouer
     let boutonCommentJouer = document.getElementById("btnCommentJouer");
     if (!boutonCommentJouer) {
-        console.log("boutonCommentJouer inexistant");
+        if (mode === "DEVELOPPEMENT") console.log("boutonCommentJouer inexistant");
         boutonCommentJouer = document.createElement("button");
         boutonCommentJouer.id = "btnCommentJouer";
         boutonCommentJouer.textContent = "?";
-        console.log("boutonCommentJouer créé");
+        if (mode === "DEVELOPPEMENT") console.log("boutonCommentJouer créé");
         document.body.appendChild(boutonCommentJouer);
-        console.log("boutonCommentJouer ajouté à body");
+        if (mode === "DEVELOPPEMENT") console.log("boutonCommentJouer ajouté à body");
 
         boutonCommentJouer.addEventListener("click", function () {
             let croix = document.getElementById("croixRegle");
@@ -203,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     sock.on("main", function (cartes) {
         partieCommencee = true;
-        console.log("Mes cartes :", cartes);
+        if (mode === "DEVELOPPEMENT") console.log("Mes cartes :", cartes);
 
         // enlever ou cacher l'écran de pseudo
         const ecran = document.getElementById("ecranPseudo");
@@ -232,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const couleur = carte.couleur !== undefined ? carte.couleur : carte[1];
             const img = document.createElement("img");
             img.src = `./images/${couleur}_${valeur}.png`;
-            console.log(img.src);
+            if (mode === "DEVELOPPEMENT") console.log(img.src);
             img.alt = `${valeur} de ${couleur}`;
             li.appendChild(img);
             ul.appendChild(li);
@@ -385,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     message += "?";
 
                     if (confirm(message)) {
-                        console.log("Cartes jouées :", cartesJouees);
+                        if (mode === "DEVELOPPEMENT") console.log("Cartes jouées :", cartesJouees);
                         sock.emit("jouer_carte", cartesJouees);
                     }
                 }
@@ -459,7 +460,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * @param {Array<Object>} tasCartes - Tableau des cartes à afficher dans le tas
      */
     function afficherTas(tasCartes) {
-        console.log("Tas de cartes sur la table :", tasCartes);
+        if (mode === "DEVELOPPEMENT") console.log("Tas de cartes sur la table :", tasCartes);
         let tasDiv = document.getElementById("tasCartes");
         if (!tasDiv) {
             tasDiv = document.createElement("div");
@@ -475,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const li = document.createElement("li");
             const img = document.createElement("img");
             img.src = `./images/${carte.couleur}_${carte.valeur}.png`;
-            console.log(img.src);
+            if (mode === "DEVELOPPEMENT") console.log(img.src);
             img.alt = `${carte.valeur} de ${carte.couleur}`;
             li.appendChild(img);
             ul.appendChild(li);
@@ -525,7 +526,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * Déclenche également la synthèse vocale
      */
     sock.on("a_toi", function (data) {
-        console.log(data.message);
+        if (mode === "DEVELOPPEMENT") console.log(data.message);
         afficherNotification(data.message, "tour");
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
@@ -538,7 +539,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * Affiche la notification d'attente et cache le bouton de jeu
      */
     sock.on("a_l_autre", function (data) {
-        console.log(data.message);
+        if (mode === "DEVELOPPEMENT") console.log(data.message);
         afficherNotification(data.message, "tour");
         afficherNbCartesAdversaires(data.nbCartesAdversaires, monPseudo);
         afficherTas(data.tasCartes);
@@ -572,7 +573,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btnEnvoyerCarteTas.style.display = "block";
         btnEnvoyerCarteTas.disabled = true;
 
-        console.log("Sélectionner une carte dans le tas :", tasCartes);
+        if (mode === "DEVELOPPEMENT") console.log("Sélectionner une carte dans le tas :", tasCartes);
         afficherNotification("C'est à vous de sélectionner une carte dans le tas.", "info");
         demarrerRappelVocal("Sélectionnez une carte dans le tas.");
 
@@ -600,7 +601,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const [valeurStr, , couleur] = alt.split(" ");
                 const valeur = parseInt(valeurStr);
                 maCarte = { valeur, couleur };
-                console.log("Carte du tas sélectionnée :", maCarte.valeur, maCarte.couleur);
+                if (mode === "DEVELOPPEMENT") console.log("Carte du tas sélectionnée :", maCarte.valeur, maCarte.couleur);
 
                 // Activer le bouton
                 btnEnvoyerCarteTas.disabled = false;
@@ -622,7 +623,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             sock.emit("carte_dans_tas_selectionnee", maCarte);
-            console.log("Carte du tas envoyée :", maCarte.valeur, maCarte.couleur);
+            if (mode === "DEVELOPPEMENT") console.log("Carte du tas envoyée :", maCarte.valeur, maCarte.couleur);
             phase = "attente";
             btnEnvoyerCarteTas.style.display = "none";
             arreterRappelVocal();
@@ -639,7 +640,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * data : {nbManche, nbManchesMax, scores: [{pseudo, cartesRestantes, scoreTotal}], nbCartesAdversaires}
      */
     sock.on("fin_manche", function (data) {
-        console.log("Fin de la manche :", data.nbManche);
+        if (mode === "DEVELOPPEMENT") console.log("Fin de la manche :", data.nbManche);
         // chercher qui a gagné la manche
         let gagnantManche = null;
         for (let score of data.scores) {
@@ -648,7 +649,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 break;
             }
         }
-        console.log("Gagnant de la manche :", gagnantManche);
+        if (mode === "DEVELOPPEMENT") console.log("Gagnant de la manche :", gagnantManche);
         parler(`Fin de la manche ${data.nbManche}. ${gagnantManche} a gagné la manche.`);
 
         // cacher le main
@@ -725,9 +726,9 @@ document.addEventListener("DOMContentLoaded", function () {
      * Crée une interface complète avec médailles et mise en évidence du joueur actuel
      */
     sock.on("fin_partie", function (data) {
-        console.log("Fin de la partie !");
-        console.log("Gagnant(s) :", data.gagnants);
-        console.log("Classement :", data.classement);
+        if (mode === "DEVELOPPEMENT") console.log("Fin de la partie !");
+        if (mode === "DEVELOPPEMENT") console.log("Gagnant(s) :", data.gagnants);
+        if (mode === "DEVELOPPEMENT") console.log("Classement :", data.classement);
 
         // Masquer tout le jeu
         const main = document.querySelector("main");
