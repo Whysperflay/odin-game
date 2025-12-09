@@ -1,7 +1,6 @@
-/* http://meyerweb.com/eric/tools/css/reset/ 
-   v2.0 | 20110126
-   License: none (public domain)
-*/
+/* ═══════════════════════════════════════════════════════════════
+   RESET CSS (Meyer Reset)
+   ═══════════════════════════════════════════════════════════════ */
 
 html,
 body,
@@ -91,6 +90,7 @@ video {
     font: inherit;
     vertical-align: baseline;
 }
+
 /* HTML5 display-role reset for older browsers */
 article,
 aside,
@@ -105,17 +105,21 @@ nav,
 section {
     display: block;
 }
+
 body {
     line-height: 1;
 }
+
 ol,
 ul {
     list-style: none;
 }
+
 blockquote,
 q {
     quotes: none;
 }
+
 blockquote:before,
 blockquote:after,
 q:before,
@@ -123,19 +127,26 @@ q:after {
     content: "";
     content: none;
 }
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
 }
 
-/* Debut feuille de style */
+/* ═══════════════════════════════════════════════════════════════
+   STYLES DE BASE
+   ═══════════════════════════════════════════════════════════════ */
+
 body {
-    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
     padding: 20px;
 }
 
-/* Ecran de connexion centré */
+/* ═══════════════════════════════════════════════════════════════
+   ÉCRAN DE CONNEXION
+   ═══════════════════════════════════════════════════════════════ */
+
 .ecran-centre {
     display: flex;
     justify-content: center;
@@ -147,7 +158,6 @@ body {
     left: 0;
 }
 
-/* Carte contenant le formulaire */
 .carte-pseudo {
     background: white;
     padding: 40px;
@@ -158,7 +168,17 @@ body {
     animation: apparition 0.5s ease-out;
 }
 
-/* Titre */
+@keyframes apparition {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .carte-pseudo h1 {
     font-size: 2.5em;
     font-weight: bold;
@@ -168,7 +188,6 @@ body {
     letter-spacing: 3px;
 }
 
-/* Groupe de formulaire */
 .form-groupe {
     margin-bottom: 25px;
 }
@@ -181,7 +200,6 @@ body {
     font-weight: 500;
 }
 
-/* Input */
 #inputPseudo {
     width: 100%;
     padding: 15px;
@@ -202,7 +220,6 @@ body {
     color: #aaa;
 }
 
-/* Bouton */
 #btnDemarrer {
     width: 100%;
     padding: 15px;
@@ -219,34 +236,33 @@ body {
 }
 
 #btnDemarrer:hover {
-    transform: translateY(-2px);
+    transform: scale(1.05);
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-#btnDemarrer:active {
-    transform: translateY(0);
 }
 
 .message-cache {
     display: none;
 }
 
-/* Zone de jeu principale */
+/* ═══════════════════════════════════════════════════════════════
+   INTERFACE DE JEU PRINCIPALE
+   ═══════════════════════════════════════════════════════════════ */
+
 main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    min-height: calc(100vh - 60px); /* hauteur écran - footer */
+    min-height: calc(100vh - 60px);
     padding: 20px;
-    padding-bottom: 80px; /* espace pour le footer */
+    padding-bottom: 80px;
     box-sizing: border-box;
 }
 
 /* Ma main en bas au centre */
 #maMain {
     position: fixed;
-    bottom: 60px; /* au-dessus du footer */
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.9);
@@ -279,6 +295,7 @@ main {
     width: 75px;
     height: 150px;
 }
+
 #maMain ul li:hover {
     transform: translateY(-20px);
     box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
@@ -290,7 +307,13 @@ main {
     transform: translateY(-2px);
 }
 
-/* Tas au milieu (pour plus tard) */
+#maMain ul li.selectionne {
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
+    transform: translateY(-15px);
+}
+
+/* Tas au milieu */
 #tasCartes {
     position: absolute;
     top: 50%;
@@ -365,49 +388,30 @@ main {
     color: #333;
 }
 
-/* Footer fixe */
-footer {
+/* Zone de notification */
+#notification {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    padding: 15px;
-    color: white;
-    font-size: 0.9em;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    z-index: 100;
-}
-
-.selectionne {
-    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
-    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
-    transform: translateY(-15px);
-}
-
-#btnJouerCarte {
-    padding: 10px 20px;
-    font-size: 1em;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
-    border: none;
+    top: 20px;
+    background: white;
+    color: black;
+    padding: 15px 25px;
     border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    position: fixed;
-    bottom: 275px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    font-size: 1em;
+    transition: opacity 0.5s ease-in-out;
+    text-align: center;
 }
 
-#btnJouerCarte:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+#notification p {
+    margin: 10px 0;
+    font-weight: 500;
 }
 
-/* Bouton pour sélectionner carte du tas */
+/* ═══════════════════════════════════════════════════════════════
+   BOUTONS D'ACTION
+   ═══════════════════════════════════════════════════════════════ */
+
+#btnJouerCarte,
 #btnEnvoyerCarteTas {
     padding: 10px 20px;
     font-size: 1em;
@@ -424,8 +428,20 @@ footer {
     bottom: 275px;
 }
 
+#boutonsMain {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+    position: absolute;
+    left: 105%;
+    top: 25%;
+    white-space: nowrap;
+}
+
+#btnJouerCarte:hover,
 #btnEnvoyerCarteTas:hover {
-    transform: translateY(-2px);
+    transform: scale(1.05);
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
@@ -434,26 +450,167 @@ footer {
     cursor: not-allowed;
 }
 
-#tasDiv ul {
-    list-style: none;
+#btnTri,
+#btnToutDeselectionner {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(10deg, #005f5f 0%, #00cccc 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#btnTri:hover,
+#btnToutDeselectionner:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+#btnToutDeselectionner:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOUTONS UTILITAIRES (TTS, Règles, etc.)
+   ═══════════════════════════════════════════════════════════════ */
+
+#btnUtilitaires {
+    position: fixed;
+    bottom: 70px;
+    left: 50px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    z-index: 1000;
+}
+
+#btnTTS,
+#btnCommentJouer {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(10deg, #005f5f 0%, #00cccc 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    height: max-content;
+    width: max-content;
+}
+
+#btnTTS:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+#btnCommentJouer:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FENÊTRE DES RÈGLES
+   ═══════════════════════════════════════════════════════════════ */
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+.overlay.cache {
+    display: none !important;
+}
+
+.fenetre-regles {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    max-height: 80vh;
+    background: white;
+    padding: 50px;
+    border-radius: 10px;
+    overflow-y: auto;
+    z-index: 1001;
+}
+
+.fenetre-regles.cache {
+    display: none !important;
+}
+
+#croixRegle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    width: 30px;
+    height: 20px;
+}
+
+#croixRegle:hover {
+    background-color: red;
+    border-radius: 5px;
+    border: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    align-items: center;
 }
 
-#tasDiv ul li {
-    padding: 8px 12px;
-    border: 2px solid #667eea;
-    border-radius: 8px;
-    font-weight: 500;
-    min-width: 100px;
+/* Typographie des règles */
+.fenetre-regles h1 {
     text-align: center;
+    margin-bottom: 50px;
+    margin-top: 20px;
+    color: #005f5f;
+    font-size: 50px;
+    font-weight: bold;
 }
 
-/* ========== ÉCRAN FIN DE MANCHE ========== */
+.fenetre-regles h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 50px;
+    color: #00a8be;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.fenetre-regles h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 50px;
+    color: #0082be;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.fenetre-regles p {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #000000;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ÉCRANS DE FIN
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Fin de manche */
 #scoreManche {
     position: fixed;
     top: 50%;
@@ -518,7 +675,7 @@ footer {
     font-style: italic;
 }
 
-/* ========== ÉCRAN FIN DE PARTIE ========== */
+/* Fin de partie */
 #finPartie {
     position: fixed;
     top: 0;
@@ -649,209 +806,20 @@ footer {
     transform: scale(1.05);
 }
 
-#notification {
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════ */
+
+footer {
     position: fixed;
-    top: 20px;
-    background: white;
-    color: black;
-    padding: 15px 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    font-size: 1em;
-    transition: opacity 0.5s ease-in-out;
-    text-align: center;
-}
-
-#notification p {
-    margin: 10px 0;
-    font-weight: 500;
-}
-
-/* bouton pour trier les cartes */
-#btnTri {
-    padding: 10px 20px;
-    font-size: 1em;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(10deg, #005f5f 0%, #00cccc 100%);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    height: max-content;
-    position: inherit;
-    width: max-content;
-    left: 105%;
-    top: 40%;
-}
-
-#btnTri:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-/*bouton comment jouer*/
-#btnCommentJouer {
-    padding: 10px 20px;
-    font-size: 1em;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(10deg, #005f5f 0%, #00cccc 100%);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    height: max-content;
-    position: fixed;
-    width: max-content;
-    left: 50px;
-    bottom: 70px;
-}
-
-#btnCommentJouer:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-/*overlay des règles*/
-#overlayhidden {
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    position: fixed;
-    z-index: 1000;
-    display: none;
-}
-
-#overlayvisible {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    position: fixed;
-    z-index: 1000;
-    display: block;
-}
-
-/*fenêtre des règles*/
-#regleshidden {
-    width: 70%;
-    height: auto;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    z-index: 1001;
-    display: none;
-    padding: 20px;
-    border-radius: 10px;
-    overflow-y: auto;
-}
-
-#reglesvisible {
-    width: 70%;
-    height: auto;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-sizing: border-box;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    z-index: 1001;
-    display: block;
-    padding: 50px;
-    border-radius: 10px;
-    overflow-y: auto;
-}
-
-#croixRegle {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    width: 30px;
-    height: 20px;
-}
-
-#croixRegle:hover {
-    background-color: red;
-    border-radius: 5px;
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-
-#regleshidden h1,
-#reglesvisible h1 {
     text-align: center;
-    margin-bottom: 50px;
-    margin-top: 20px;
-    color: #005f5f;
-    font-size: 50px;
-    font-weight: bold;
-}
-
-#regleshidden h2,
-#reglesvisible h2 {
-    text-align: center;
-    margin-bottom: 30px;
-    margin-top: 50px;
-    color: #00a8be;
-    font-size: 40px;
-    font-weight: bold;
-}
-
-#regleshidden h3,
-#reglesvisible h3 {
-    text-align: center;
-    margin-bottom: 30px;
-    margin-top: 50px;
-    color: #0082be;
-    font-size: 30px;
-    font-weight: bold;
-}
-
-#regleshidden p,
-#reglesvisible p,
-#regleshidden li,
-#reglesvisible li {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #000000;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-#btnTTS {
-    padding: 10px 20px;
-    font-size: 1em;
-    font-weight: bold;
+    padding: 15px;
     color: white;
-    background: linear-gradient(10deg, #005f5f 0%, #00cccc 100%);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    height: max-content;
-    position: fixed;
-    width: max-content;
-    left: 110px;
-    bottom: 70px;
-}
-
-#btnTTS:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    font-size: 0.9em;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: 100;
 }

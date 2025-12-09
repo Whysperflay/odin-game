@@ -41,8 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // ═══════════════════════════════════════════════════════════════
 
     initialiserEvenementClavier();
-    initialiserBoutonTTS();
+    initialiserDivBoutonsUtilitaires();
     initialiserFenetreRegles();
+    initialiserBoutonTTS();
     initialiserBoutonDemarrer();
 
     /**
@@ -76,7 +77,12 @@ document.addEventListener("DOMContentLoaded", function () {
             boutonTTS = document.createElement("button");
             boutonTTS.id = "btnTTS";
             boutonTTS.textContent = "TTS : ON";
-            document.body.appendChild(boutonTTS);
+            if (document.getElementById("btnUtilitaires")) {
+                document.getElementById("btnUtilitaires").appendChild(boutonTTS);
+            } else {
+                initialiserDivBoutonsUtilitaires();
+                document.getElementById("btnUtilitaires").appendChild(boutonTTS);
+            }
         }
 
         boutonTTS.addEventListener("click", function () {
@@ -96,9 +102,11 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     function initialiserFenetreRegles() {
         const overlay = document.createElement("div");
-        overlay.id = "overlayhidden";
+        overlay.className = "overlay";
+        overlay.classList.add("cache");
         const fenRegle = document.createElement("div");
-        fenRegle.id = "regleshidden";
+        fenRegle.className = "fenetre-regles";
+        fenRegle.classList.add("cache");
 
         chargerRegles(fenRegle);
 
@@ -141,7 +149,12 @@ document.addEventListener("DOMContentLoaded", function () {
             boutonCommentJouer = document.createElement("button");
             boutonCommentJouer.id = "btnCommentJouer";
             boutonCommentJouer.textContent = "?";
-            document.body.appendChild(boutonCommentJouer);
+            if (document.getElementById("btnUtilitaires")) {
+                document.getElementById("btnUtilitaires").appendChild(boutonCommentJouer);
+            } else {
+                initialiserDivBoutonsUtilitaires();
+                document.getElementById("btnUtilitaires").appendChild(boutonCommentJouer);
+            }
         }
 
         boutonCommentJouer.addEventListener("click", function () {
@@ -151,8 +164,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 croix.id = "croixRegle";
                 croix.textContent = "X";
 
-                overlay.id = "overlayvisible";
-                fenRegle.id = "reglesvisible";
+                overlay.classList.remove("cache");
+                fenRegle.classList.remove("cache");
                 fenRegle.appendChild(croix);
 
                 // Fermeture par la croix
@@ -166,8 +179,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         function fermerRegles() {
-            overlay.id = "overlayhidden";
-            fenRegle.id = "regleshidden";
+            overlay.classList.add("cache");
+            fenRegle.classList.add("cache");
             const croix = document.getElementById("croixRegle");
             if (croix) croix.remove();
         }
@@ -208,6 +221,15 @@ document.addEventListener("DOMContentLoaded", function () {
             btnDemarrer.disabled = true;
             inputPseudo.disabled = true;
         });
+    }
+
+    function initialiserDivBoutonsUtilitaires() {
+        let divBtnUtilitaires = document.getElementById("btnUtilitaires");
+        if (!divBtnUtilitaires) {
+            divBtnUtilitaires = document.createElement("div");
+            divBtnUtilitaires.id = "btnUtilitaires";
+            document.body.appendChild(divBtnUtilitaires);
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -360,6 +382,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (btnJouerCarte) {
                     const cartesSelectionnees = document.querySelectorAll("#maMain li.selectionne");
                     btnJouerCarte.textContent = cartesSelectionnees.length > 0 ? "Jouer la carte" : "Passer le tour";
+
+                    const btnToutDeselectionner = document.getElementById("btnToutDeselectionner");
+                    if (btnToutDeselectionner && cartesSelectionnees.length === 0) {
+                        btnToutDeselectionner.disabled = true;
+                    } else if (btnToutDeselectionner && cartesSelectionnees.length !== 0) {
+                        btnToutDeselectionner.disabled = false;
+                    }
                 }
             });
         }
@@ -478,6 +507,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const mainDiv = document.createElement("div");
         mainDiv.id = "maMain";
 
+        // Créer la liste des cartes
         const ul = document.createElement("ul");
         for (let carte of cartes) {
             const li = document.createElement("li");
@@ -490,6 +520,45 @@ document.addEventListener("DOMContentLoaded", function () {
             ul.appendChild(li);
         }
         mainDiv.appendChild(ul);
+
+        // Créer la div pour les boutons
+        const boutonsMainDiv = document.createElement("div");
+        boutonsMainDiv.id = "boutonsMain";
+
+        // Créer le bouton de tri
+        const boutonTri = document.createElement("button");
+        boutonTri.id = "btnTri";
+        boutonTri.textContent = texteBoutonTri;
+        boutonTri.addEventListener("click", function () {
+            const parCouleur = boutonTri.textContent.includes("couleur");
+            sock.emit("trier_carte", parCouleur);
+            boutonTri.textContent = boutonTri.textContent === "Trier par valeur" ? "Trier par couleur" : "Trier par valeur";
+        });
+        boutonsMainDiv.appendChild(boutonTri);
+
+        // Créer le bouton TOUT DÉSÉLECTIONNER SEULEMENT s'il n'existe pas
+        let btnToutDeselectionner = document.getElementById("btnToutDeselectionner");
+        if (!btnToutDeselectionner) {
+            btnToutDeselectionner = document.createElement("button");
+            btnToutDeselectionner.id = "btnToutDeselectionner";
+            btnToutDeselectionner.textContent = "TOUT DÉSÉLECTIONNER";
+            btnToutDeselectionner.disabled = true;
+
+            btnToutDeselectionner.addEventListener("click", function () {
+                const cartes = document.querySelectorAll("#maMain li.selectionne");
+                cartes.forEach((el) => el.classList.remove("selectionne"));
+
+                const btnJouerCarte = document.getElementById("btnJouerCarte");
+                if (btnJouerCarte) {
+                    btnJouerCarte.textContent = "Passer le tour";
+                }
+                btnToutDeselectionner.disabled = true;
+            });
+        }
+        boutonsMainDiv.appendChild(btnToutDeselectionner);
+
+        // Ajouter la div des boutons à la main
+        mainDiv.appendChild(boutonsMainDiv);
 
         const container = document.querySelector("main") || document.body;
         container.appendChild(mainDiv);
@@ -505,21 +574,6 @@ document.addEventListener("DOMContentLoaded", function () {
             p2.textContent = "Ligne 2 de la notification";
             notificationDiv.appendChild(p2);
             container.appendChild(notificationDiv);
-        }
-
-        // Créer le bouton de tri
-        let boutonTri = document.getElementById("btnTri");
-        if (!boutonTri) {
-            boutonTri = document.createElement("button");
-            boutonTri.id = "btnTri";
-            boutonTri.textContent = texteBoutonTri;
-            mainDiv.appendChild(boutonTri);
-
-            boutonTri.addEventListener("click", function () {
-                const parCouleur = boutonTri.textContent.includes("couleur");
-                sock.emit("trier_carte", parCouleur);
-                boutonTri.textContent = boutonTri.textContent === "Trier par valeur" ? "Trier par couleur" : "Trier par valeur";
-            });
         }
 
         const btnJouerCarte = document.getElementById("btnJouerCarte");
