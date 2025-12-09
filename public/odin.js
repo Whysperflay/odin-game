@@ -48,11 +48,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         boutonTTS.addEventListener("click", function () {
-            if (TTSactive) {
-                parler("Vous allez me manquer !");
+            if (!TTSactive) {
+                parler("Vous m'avez manqué !", true);
             } else {
-                parler("Vous m'avez manqué !");
+                parler("Vous allez me manquer !", true);
             }
+
             TTSactive = !TTSactive;
             boutonTTS.textContent = TTSactive ? "TTS : ON" : "TTS : OFF";
         });
@@ -287,136 +288,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /**
-     * Crée l'interface de la fenêtre des règles du jeu
-     * Génère tous les éléments HTML (titres, paragraphes, listes) expliquant les règles
+     * Charge et affiche les règles depuis le fichier regles.html
      */
-    function creerRegle() {
-        const titreRegle = document.createElement("h1");
-        titreRegle.textContent = "COMMENT JOUER";
-        fenRegle.appendChild(titreRegle);
-        let h2 = document.createElement("h2");
-        h2.textContent = "Matériel du jeu";
-        fenRegle.appendChild(h2);
-        let p = document.createElement("p");
-        p.textContent = "54 cartes numérotées de 1 à 9 en 6 couleurs";
-        fenRegle.appendChild(p);
-        h2 = document.createElement("h2");
-        h2.textContent = "But du jeu";
-        fenRegle.appendChild(h2);
-        p = document.createElement("p");
-        p.textContent = "Soyez le premier à vous défausser de toutes les cartes de votre main et à cumuler le moins de points à la fin de la partie.";
-        fenRegle.appendChild(p);
-        h2 = document.createElement("h2");
-        h2.textContent = "Mise en place";
-        fenRegle.appendChild(h2);
-        p = document.createElement("p");
-        p.textContent = "Au début de la partie, chaque joueur commence avec 0 points.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent = "Au début de chaque manche, 9 cartes seront prises au hasard dans le paquet et seront attribuées à chaque joueur.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent = "Au début de la nouvelle manche, 9 cartes sont distribuées à chaque joueur...";
-        fenRegle.appendChild(p);
-        h2 = document.createElement("h2");
-        h2.textContent = "Déroulement du jeu ";
-        fenRegle.appendChild(h2);
-        p = document.createElement("p");
-        p.textContent = "Le jeu se déroule sur plusieurs manches et celles-ci se divisent en plusieurs tours.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent = "Au début d'un tour, la première personne à jouer doit poser une de ses cartes dans le tas.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent = "Puis, chacun peut dans son tour de jeu, soit:";
-        fenRegle.appendChild(p);
-        let ul = document.createElement("ul");
-        let li = document.createElement("li");
-        li.textContent = "Jouer une ou plusieurs de ses cartes";
-        ul.appendChild(li);
-        li = document.createElement("li");
-        li.textContent = "Passer son tour";
-        ul.appendChild(li);
-        fenRegle.appendChild(ul);
-        let h3 = document.createElement("h3");
-        h3.textContent = "Jouer une ou plusieurs de ses cartes";
-        fenRegle.appendChild(h3);
-        p = document.createElement("p");
-        p.textContent = "La valeur que vous posez doit être strictement supérieure à la valeur dans le tas.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent = "EXEMPLE : Si au centre il y a un 3, vous devez jouer 4 ou plus";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent = "Vous pouvez jouer le même nombre de cartes que le nombre de cartes dans le tas ou une carte de plus.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent =
-            "EXEMPLE : Sur une combinaison de 2 cartes, vous pouvez jouer une autre combinaison de 2 cartes ou une combinaison de 3 cartes, mais pas de combinaison de 4 cartes, ni une carte seule";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent =
-            "Si vous jouez un 2 et un 8 (de la même couleur donc), la valeur de cette combinaison est 82 et non pas 28. Si vous jouez un 2, un 4 et un 9 (toujours de la même couleur), la valeur est de 942.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent =
-            "Après avoir joué une ou plusieurs cartes, vous devez récupérer une des cartes qui se trouvait dans le précédent tas. Ce qui signifie que:";
-        fenRegle.appendChild(p);
-        ul = document.createElement("ul");
-        li = document.createElement("li");
-        li.textContent = "S'il n'y avait qu'une seule carte, vous la récupérez";
-        ul.appendChild(li);
-        li = document.createElement("li");
-        li.textContent = "S'il y en avait plusieurs alors vous choisissez laquelle vous voulez récupérer";
-        ul.appendChild(li);
-        fenRegle.appendChild(ul);
-        h3 = document.createElement("h3");
-        h3.textContent = "Passer son tour";
-        fenRegle.appendChild(h3);
-        p = document.createElement("p");
-        p.textContent = "Si vous passez, vous ne posez pas de carte et c'est au tour de jeu du(de la) prochain(e) joueur(se)";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent = "NOTE : Même si vous passez, vous pourrez jouer à nouveau lors de votre prochain tour de jeu.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent =
-            "Si tout le monde passe son tour, le tour se termine, les cartes dans le tas se défaussent. La dernière personne à avoir posé une carte entame un nouveau tour. Chacun garde les cartes qu'il a en main.";
-        fenRegle.appendChild(p);
-        h2 = document.createElement("h2");
-        h2.textContent = "FIN DE MANCHE";
-        fenRegle.appendChild(h2);
-        p = document.createElement("p");
-        p.textContent = "Une manche se termine dans deux cas :";
-        fenRegle.appendChild(p);
-        ul = document.createElement("ul");
-        li = document.createElement("li");
-        li.textContent =
-            "Si vous êtes la personne qui démarre un nouveau tour et si toutes les cartes que vous avez en main ont la même valeur ou la même couleur. Vous pouvez les jouer et la manche s'arrête. Sinon, jouez une seule carte normalement.";
-        ul.appendChild(li);
-        li = document.createElement("li");
-        li.textContent =
-            "À n'importe quel moment, si vous jouez une ou plusieurs cartes et si votre main est vide. Vous ne prenez pas de cartes dans le tas et la manche s'arrête.";
-        ul.appendChild(li);
-        fenRegle.appendChild(ul);
-        p = document.createElement("p");
-        p.textContent = "À la fin de chaque manche, vous marquez autant de points que le nombre de cartes qu'il vous reste en main.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent =
-            "Au début de la nouvelle manche, 9 cartes sont distribuées à chaque joueur, le joueur ou la joueuse qui jouait anciennement après le vainqueur de la manche commence un nouveau tour en posant 1 carte.";
-        fenRegle.appendChild(p);
-        h2 = document.createElement("h2");
-        h2.textContent = "FIN DE LA PARTIE";
-        fenRegle.appendChild(h2);
-        p = document.createElement("p");
-        p.textContent =
-            "Dès qu'un joueur atteint le seuil de points défini au début de la partie (15 de base), alors la partie est terminée et le joueur ayant le moins de points remporte la partie.";
-        fenRegle.appendChild(p);
-        p = document.createElement("p");
-        p.textContent =
-            "Si la partie est définie en manche, alors ce sera le joueur ayant le moins de points à la fin de la dernière manche qui remportera la partie.";
-        fenRegle.appendChild(p);
+    async function creerRegle() {
+        try {
+            const reponse = await fetch("./regles.html");
+            if (!reponse.ok) {
+                throw new Error("Erreur lors du chargement des règles du jeu.");
+            }
+            const htmlRegles = await reponse.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlRegles, "text/html");
+            const contenuRegles = doc.querySelector("main");
+
+            if (contenuRegles && contenuRegles.innerHTML.trim() !== "") {
+                fenRegle.innerHTML = contenuRegles.innerHTML;
+            } else {
+                console.error("Aucun contenu de règles trouvé dans le fichier.");
+            }
+        } catch (error) {
+            console.error("Erreur lors du chargement des règles du jeu :", error);
+            fenRegle.textContent = "Erreur lors du chargement des règles du jeu.";
+        }
     }
 
     /**
@@ -821,6 +715,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Réafficher le main
             if (main) main.style.display = "flex";
+            arreterRappelVocal();
         }, 10000);
     });
 
@@ -924,10 +819,14 @@ document.addEventListener("DOMContentLoaded", function () {
      * Utilise la synthèse vocale du navigateur pour lire un texte
      * Annule toute lecture en cours avant de démarrer la nouvelle
      * @param {string} texte - Le texte à lire à voix haute
+     * @param {boolean} forcer - Force la lecture même si TTS désactivé (pour bouton TTS)
      */
-    function parler(texte) {
-        if (partieCommencee === false && texte !== "Vous allez me manquer !" && texte !== "Vous m'avez manqué !") return;
-        if (!TTSactive) return;
+    function parler(texte, forcer = false) {
+        if (!forcer) {
+            if (!TTSactive) return;
+            if (!partieCommencee) return;
+        }
+
         if ("speechSynthesis" in window) {
             window.speechSynthesis.cancel();
 
