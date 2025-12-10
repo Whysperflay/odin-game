@@ -1,15 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                         CONSTANTES
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     const MODE = "PRODUCTION"; // PRODUCTION ou DEVELOPPEMENT
     const DELAI_FIN_MANCHE = 10000;
     const DELAI_RAPPEL_VOCAL = 10000;
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                      VARIABLES GLOBALES
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     /** @type {Object} Socket.io pour la communication avec le serveur */
     let sock = io.connect();
@@ -29,22 +29,29 @@ document.addEventListener("DOMContentLoaded", function () {
     /** @type {number|null} ID de l'intervalle de rappel vocal */
     let intervalRappel = null;
 
-    // ═══════════════════════════════════════════════════════════════
+    /** @type {string|null} Type de partie : "points", "manches" ou null */
+    let typePartie = null;
+
+    /** @type {number|null} Longueur de la partie */
+    let longueurPartie = null;
+
+    // ===============================================================
     //                      ÉLÉMENTS DOM
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     const inputPseudo = document.getElementById("inputPseudo");
     const btnDemarrer = document.getElementById("btnDemarrer");
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                   INITIALISATION INTERFACE
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     initialiserEvenementClavier();
     initialiserDivBoutonsUtilitaires();
     initialiserFenetreRegles();
     initialiserBoutonTTS();
     initialiserBoutonDemarrer();
+    initialiserChoixPartie();
 
     /**
      * Initialise les événements clavier (touche Enter)
@@ -212,14 +219,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Envoi au serveur
-            sock.emit("demarrer", pseudo);
+            if (!typePartie) {
+                alert("Veuillez choisir un type de partie (Points ou Manches).");
+                return;
+            }
+            if (!longueurPartie) {
+                alert("Veuillez choisir une longueur de partie.");
+                return;
+            }
+
+            sock.emit("demarrer", {
+                pseudo: pseudo,
+                typePartie: typePartie,
+                longueurPartie: longueurPartie,
+            });
+
+            if (MODE === "DEVELOPPEMENT") {
+                console.log(`Démarrage: ${pseudo}, Type: ${typePartie}, Longueur: ${longueurPartie}`);
+            }
+
             phase = "attente";
             monPseudo = pseudo;
 
             // Désactiver les champs
             btnDemarrer.disabled = true;
             inputPseudo.disabled = true;
+
+            // Désactiver les boutons de choix
+            document.querySelectorAll(".bouton-type-partie, .bouton-longueur").forEach((btn) => {
+                btn.style.pointerEvents = "none";
+                btn.style.opacity = "0.6";
+            });
         });
     }
 
@@ -232,9 +262,100 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
+    /**
+     * Initialise les choix de type et longueur de partie
+     */
+    function initialiserChoixPartie() {
+        const choixPoints = document.getElementById("choixPoints");
+        const choixManches = document.getElementById("choixManches");
+        const divLongueur = document.getElementById("choixLongueurPartie");
+
+        // Fonction pour générer les boutons de longueur
+        function genererBoutonsLongueur(type) {
+            divLongueur.innerHTML = "";
+
+            const valeurs = type === "points" ? [10, 15, 20] : [2, 3, 5];
+
+            valeurs.forEach((valeur, index) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = index === 0 ? "bouton-longueur selectionne" : "bouton-longueur";
+                btn.textContent = valeur;
+                btn.dataset.valeur = valeur;
+
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    // Désélectionner tous les boutons
+                    document.querySelectorAll(".bouton-longueur").forEach((b) => {
+                        b.classList.remove("selectionne");
+                    });
+                    // Sélectionner celui-ci
+                    this.classList.add("selectionne");
+                    longueurPartie = parseInt(this.dataset.valeur);
+
+                    if (MODE === "DEVELOPPEMENT") {
+                        console.log(`Longueur sélectionnée: ${longueurPartie}`);
+                    }
+                });
+
+                divLongueur.appendChild(btn);
+            });
+
+            // Définir la valeur par défaut
+            longueurPartie = valeurs[0];
+
+            setTimeout(() => {
+                divLongueur.classList.add("visible");
+            }, 50);
+        }
+
+        // Gérer le changement de type (Points/Manches)
+        choixPoints.addEventListener("change", function () {
+            if (this.checked) {
+                typePartie = "points";
+
+                // Mettre à jour les styles des labels
+                document.querySelectorAll("#choixTypePartie label").forEach((label) => {
+                    label.classList.remove("selectionne");
+                });
+                this.parentElement.classList.add("selectionne");
+
+                divLongueur.classList.remove("visible");
+                setTimeout(() => {
+                    genererBoutonsLongueur("points");
+                }, 300);
+
+                if (MODE === "DEVELOPPEMENT") {
+                    console.log("Type: POINTS");
+                }
+            }
+        });
+
+        choixManches.addEventListener("change", function () {
+            if (this.checked) {
+                typePartie = "manches";
+
+                // Mettre à jour les styles des labels
+                document.querySelectorAll("#choixTypePartie label").forEach((label) => {
+                    label.classList.remove("selectionne");
+                });
+                this.parentElement.classList.add("selectionne");
+
+                divLongueur.classList.remove("visible");
+                setTimeout(() => {
+                    genererBoutonsLongueur("manches");
+                }, 300);
+
+                if (MODE === "DEVELOPPEMENT") {
+                    console.log("Type: MANCHES");
+                }
+            }
+        });
+    }
+
+    // ===============================================================
     //                    FONCTIONS UTILITAIRES
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     /**
      * Affiche un message dans la zone de notification
@@ -310,9 +431,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                    GESTION SYNTHÈSE VOCALE
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     /**
      * Utilise la synthèse vocale pour lire un texte
@@ -358,9 +479,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                    GESTION DES CARTES
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     /**
      * Attache les listeners aux cartes pour la sélection
@@ -457,9 +578,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                  ÉVÉNEMENTS SOCKET - CONNEXION
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     sock.on("en_attente", function (message) {
         btnDemarrer.innerHTML = message;
@@ -482,9 +603,9 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => location.reload(), 10000);
     });
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                   ÉVÉNEMENTS SOCKET - PARTIE
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     sock.on("main", function (cartes) {
         partieCommencee = true;
@@ -554,8 +675,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 btnToutDeselectionner.disabled = true;
             });
+
+            boutonsMainDiv.appendChild(btnToutDeselectionner);
+        } else {
+            boutonsMainDiv.appendChild(btnToutDeselectionner);
         }
-        boutonsMainDiv.appendChild(btnToutDeselectionner);
 
         // Ajouter la div des boutons à la main
         mainDiv.appendChild(boutonsMainDiv);
@@ -600,9 +724,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (btnJouerCarte) btnJouerCarte.style.display = "none";
     });
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                   ÉVÉNEMENTS SOCKET - TOUR
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     sock.on("a_toi", function (data) {
         if (MODE === "DEVELOPPEMENT") console.log(data.message);
@@ -701,9 +825,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
     //                   ÉVÉNEMENTS SOCKET - FIN
-    // ═══════════════════════════════════════════════════════════════
+    // ===============================================================
 
     sock.on("fin_manche", function (data) {
         if (MODE === "DEVELOPPEMENT") console.log("Fin manche :", data.nbManche);
@@ -735,7 +859,11 @@ document.addEventListener("DOMContentLoaded", function () {
         scoreMancheDiv.id = "scoreManche";
 
         const titre = document.createElement("h2");
-        titre.textContent = `Fin de la manche ${data.nbManche} / ${data.nbManchesMax}`;
+        if (data.typePartie === "manches") {
+            titre.textContent = `Fin de la manche ${data.nbManche} / ${data.longueurPartie}`;
+        } else {
+            titre.textContent = `Fin de la manche ${data.nbManche}`;
+        }
         scoreMancheDiv.appendChild(titre);
 
         const tableau = document.createElement("table");

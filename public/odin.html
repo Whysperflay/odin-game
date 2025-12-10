@@ -15,7 +15,23 @@
                     <div class="form-groupe">
                         <label for="inputPseudo">Entrez votre pseudo</label>
                         <input type="text" id="inputPseudo" placeholder="Pseudo (max 20 caractères)" maxlength="20" autocomplete="off" />
+
+                        <div class="label-choix">Type de partie</div>
+
+                        <div id="choixTypePartie">
+                            <label for="choixPoints" class="bouton-type-partie">
+                                POINTS
+                                <input type="radio" name="typePartie" id="choixPoints" />
+                            </label>
+                            <label for="choixManches" class="bouton-type-partie">
+                                MANCHES
+                                <input type="radio" name="typePartie" id="choixManches" />
+                            </label>
+                        </div>
+
+                        <div id="choixLongueurPartie"></div>
                     </div>
+
                     <button id="btnDemarrer">Démarrer la partie</button>
                 </div>
             </div>

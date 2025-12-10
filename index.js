@@ -24,7 +24,6 @@ app.get("/", function (req, res) {
  ***************************************************************/
 
 let parties = {};
-
 let compteur = 0;
 
 /**
@@ -220,16 +219,29 @@ io.on("connection", (socket) => {
 
     /**
      *  Demande le démarrage d'une partie.
-     *  @param  pseudo  le pseudo du joueur
+     *  @param  data  objet contenant pseudo, typePartie, longueurPartie
      */
-    socket.on("demarrer", function (pseudo) {
+    socket.on("demarrer", function (data) {
+        const { pseudo, typePartie, longueurPartie } = data;
+
         // vérification du pseudo
         if (!pseudo || pseudo.trim().length === 0 || typeof pseudo !== "string" || pseudo.length > 20) {
             socket.emit("erreur", "Pseudo invalide.");
             return;
         }
 
-        console.log("Le joueur " + pseudo + " demande à démarrer une partie.");
+        if (!typePartie || (typePartie !== "points" && typePartie !== "manches")) {
+            socket.emit("erreur", "Type de partie invalide.");
+            return;
+        }
+
+        const valeursValides = typePartie === "points" ? [10, 15, 20] : [2, 3, 5];
+        if (!longueurPartie || !valeursValides.includes(longueurPartie)) {
+            socket.emit("erreur", "Longueur de partie invalide.");
+            return;
+        }
+
+        console.log(`Le joueur ${pseudo} demande à démarrer une partie : ${typePartie} - ${longueurPartie}`);
 
         // si le joueur est déjà en train de jouer à une partie
         if (index != -1) {
@@ -237,31 +249,48 @@ io.on("connection", (socket) => {
             return;
         }
 
-        console.log("Pseudo reçu : ", pseudo);
+        let partieExistante = null;
+        for (let p in parties) {
+            if (parties[p].typePartie === typePartie && parties[p].longueurPartie === longueurPartie && parties[p].joueurs.length < 3) {
+                partieExistante = p;
+                break;
+            }
+        }
 
         // assignation d'une place au joueur
-        if (parties[compteur] && parties[compteur].joueurs.length < 3) {
-            partie = compteur;
+        if (partieExistante) {
+            partie = partieExistante;
             index = parties[partie].joueurs.length;
+            console.log(`  -> Rejoint la partie ${partie} (${typePartie} - ${longueurPartie})`);
         } else {
             // creation d'une nouvelle partie
             compteur++;
             partie = compteur;
-            parties[partie] = { joueurs: [], courant: -1, premierTour: true, tasCartes: [], cartesEnCoursDejeu: [], nbManches: 0 };
+            parties[partie] = {
+                joueurs: [],
+                courant: -1,
+                premierTour: true,
+                tasCartes: [],
+                cartesEnCoursDejeu: [],
+                nbManches: 0,
+                typePartie: typePartie,
+                longueurPartie: longueurPartie,
+            };
             index = 0;
+            console.log(`  -> Nouvelle partie ${partie} créée (${typePartie} - ${longueurPartie})`);
         }
 
         // ajout du joueur à la partie en cours
         parties[partie].joueurs[index] = new Joueur(socket, pseudo);
-        console.log("  -> joueur ajouté à la partie " + partie + ", à l'indice " + index);
+        console.log(`  -> joueur ajouté à la partie ${partie}, à l'indice ${index}`);
 
         if (parties[partie].joueurs.length == 3) {
             // les trois joueurs sont prêts
-            console.log("Début de la partie " + partie);
+            console.log(`Début de la partie ${partie} (${typePartie} - ${longueurPartie})`);
             debutPartie(partie);
         } else {
             // seul le joueur présent est là
-            socket.emit("en_attente", "En attente d'autres joueurs");
+            socket.emit("en_attente", `En attente d'autres joueurs (${typePartie} - ${longueurPartie})`);
         }
     });
 
@@ -713,7 +742,8 @@ io.on("connection", (socket) => {
                 scores: scoresPartie,
                 nbManche: parties[partie].nbManches + 1,
                 nbCartesAdversaires: nbCartesAdversaires,
-                nbManchesMax: NB_MANCHES_MAX,
+                typePartie: parties[partie].typePartie,
+                longueurPartie: parties[partie].longueurPartie,
             });
         }
 
@@ -721,13 +751,31 @@ io.on("connection", (socket) => {
         parties[partie].nbManches++;
 
         // Vérifier fin de partie
-        if (parties[partie].nbManches >= NB_MANCHES_MAX) {
-            finDePartie();
+        if (parties[partie].typePartie === "manches") {
+            if (parties[partie].nbManches >= parties[partie].longueurPartie) {
+                finDePartie();
+            } else {
+                setTimeout(() => {
+                    if (parties[partie]) {
+                        nouvelleManche();
+                    }
+                }, 10000);
+            }
+        } else if (parties[partie].typePartie === "points") {
+            const scoreMax = Math.max(...parties[partie].joueurs.map((j) => j.score));
+            if (scoreMax >= parties[partie].longueurPartie) {
+                finDePartie();
+            } else {
+                setTimeout(() => {
+                    if (parties[partie]) {
+                        nouvelleManche();
+                    }
+                }, 10000);
+            }
         } else {
-            // Nouvelle manche après 3 secondes
+            // Mode manches : nouvelle manche
             setTimeout(() => {
                 if (parties[partie]) {
-                    // Vérifier que la partie existe encore
                     nouvelleManche();
                 }
             }, 10000);

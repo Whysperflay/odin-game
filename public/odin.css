@@ -1,6 +1,6 @@
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    RESET CSS (Meyer Reset)
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 html,
 body,
@@ -133,9 +133,9 @@ table {
     border-spacing: 0;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    STYLES DE BASE
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 body {
     font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -143,9 +143,9 @@ body {
     padding: 20px;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    ÉCRAN DE CONNEXION
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 .ecran-centre {
     display: flex;
@@ -209,6 +209,7 @@ body {
     box-sizing: border-box;
     transition: all 0.3s ease;
     outline: none;
+    margin-bottom: 25px;
 }
 
 #inputPseudo:focus {
@@ -244,9 +245,105 @@ body {
     display: none;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
+   CHOIX TYPE ET LONGUEUR DE PARTIE
+   =============================================================== */
+
+#choixTypePartie {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.label-choix {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #005f5f;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bouton-type-partie {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #666;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bouton-type-partie:hover {
+    border-color: #00cccc;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 204, 204, 0.2);
+}
+
+.bouton-type-partie.selectionne {
+    color: white;
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    border-color: #00cccc;
+    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.4);
+}
+
+/* Cacher les inputs radio natifs */
+#choixTypePartie input[type="radio"] {
+    display: none;
+}
+
+#choixLongueurPartie {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+}
+
+#choixLongueurPartie.visible {
+    opacity: 1;
+    max-height: 100px;
+}
+
+.bouton-longueur {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #666;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 60px;
+}
+
+.bouton-longueur:hover {
+    border-color: #00cccc;
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(0, 204, 204, 0.2);
+}
+
+.bouton-longueur.selectionne {
+    color: white;
+    background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+    border-color: #00cccc;
+    box-shadow: 0 5px 15px rgba(0, 204, 204, 0.4);
+}
+
+/* ===============================================================
    INTERFACE DE JEU PRINCIPALE
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 main {
     display: flex;
@@ -407,9 +504,9 @@ main {
     font-weight: 500;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    BOUTONS D'ACTION
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 #btnJouerCarte,
 #btnEnvoyerCarteTas {
@@ -476,9 +573,9 @@ main {
     cursor: not-allowed;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    BOUTONS UTILITAIRES (TTS, Règles, etc.)
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 #btnUtilitaires {
     position: fixed;
@@ -517,9 +614,9 @@ main {
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    FENÊTRE DES RÈGLES
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 .overlay {
     position: fixed;
@@ -606,9 +703,9 @@ main {
     font-weight: bold;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    ÉCRANS DE FIN
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 /* Fin de manche */
 #scoreManche {
@@ -806,9 +903,9 @@ main {
     transform: scale(1.05);
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    FOOTER
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
 footer {
     position: fixed;
