@@ -144,6 +144,240 @@ body {
 }
 
 /* ===============================================================
+   DARK MODE
+   =============================================================== */
+
+    /* ===============================================================
+    STYLE DE BASE EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode{
+        background: linear-gradient(135deg, #000000 0%, #001e1e 100%);
+    }
+
+    /* ===============================================================
+    ECRAN DE CONNEXION EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode .carte-pseudo {
+        background: #222;
+        color: #00cccc;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    body.dark-mode #inputPseudo {
+        background: #333;
+        color: #eee;
+        border: 2px solid #555;
+    }
+
+    body.dark-mode #inputPseudo:focus {
+        border-color: #00cccc;
+        box-shadow: 0 0 0 3px rgba(0, 204, 204, 0.2);
+    }
+
+    body.dark-mode #btnDemarrer {
+        background: linear-gradient(135deg, #009999 0%, #004d4d 100%);
+    }
+
+    body.dark-mode #btnDemarrer:hover {
+        box-shadow: 0 5px 20px rgba(0, 204, 204, 0.6);
+    }
+
+    /* ===============================================================
+    CHOIX TYPE ET LONGUEUR DE PARTIE EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode .bouton-type-partie,
+    body.dark-mode .bouton-longueur {
+        background: #333;
+        color: #eee;
+        border: 2px solid #555;
+    }
+
+    body.dark-mode .bouton-type-partie:hover,
+    body.dark-mode .bouton-longueur:hover {
+        border-color: #00cccc;
+        box-shadow: 0 3px 10px rgba(0, 204, 204, 0.4);
+    }
+
+    /* ===============================================================
+    INTERFACE DE JEU PRINCIPALE EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode #tasCartes {
+        background: rgba(50, 50, 50, 0.5);
+        border-color: #00cccc;
+    }
+
+    body.dark-mode #tasCartes li:hover {
+        box-shadow: 0 3px 10px rgba(0, 204, 204, 0.5);
+    }
+
+    body.dark-mode #tasCartes li.selectionneTas {
+        box-shadow: 0 5px 15px rgba(0, 204, 204, 0.7);
+    }
+
+    body.dark-mode #maMain {
+        background: rgba(50, 50, 50, 0.9);
+    }
+
+    body.dark-mode #maMain ul li:hover {
+        background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+        color: #eee;
+    }
+
+    body.dark-mode #maMain ul li.selectionne {
+        background: linear-gradient(135deg, #00cccc 0%, #005f5f 100%);
+        box-shadow: 0 5px 15px rgba(0, 204, 204, 0.5);
+    }
+
+    body.dark-mode .adversaire {
+        background: rgba(50, 50, 50, 0.9);
+    }
+
+    body.dark-mode .adversaire .nom {
+        color: #00cccc;
+    }
+
+    body.dark-mode .adversaire .nbCartes {
+        color: #eee;
+    }
+
+    body.dark-mode #notification {
+        background: #333;
+        color: #eee;
+    }
+
+    /* ===============================================================
+    BOUTONS D'ACTION EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode #btnJouerCarte,
+    body.dark-mode #btnEnvoyerCarteTas {
+        background: linear-gradient(135deg, #009999 0%, #004d4d 100%);
+    }
+
+    body.dark-mode #btnJouerCarte:hover,
+    body.dark-mode #btnEnvoyerCarteTas:hover {
+        box-shadow: 0 5px 20px rgba(0, 204, 204, 0.6);
+    }
+
+    body.dark-mode #btnTri,
+    body.dark-mode #btnToutDeselectionner {
+        background: linear-gradient(10deg, #004d4d 0%, #009999 100%);
+    }
+
+    body.dark-mode #btnTri:hover,
+    body.dark-mode #btnToutDeselectionner:hover {
+        box-shadow: 0 5px 20px rgba(0, 204, 204, 0.6);
+    }
+
+    /* ===============================================================
+    BOUTONS UTILITAIRES (TTS, Règles, etc.) EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode #btnTTS,
+    body.dark-mode #btnCommentJouer {
+        background: linear-gradient(10deg, #004d4d 0%, #009999 100%);
+    }
+
+    body.dark-mode #btnTTS:hover,
+    body.dark-mode #btnCommentJouer:hover {
+        box-shadow: 0 5px 20px rgba(0, 204, 204, 0.6);
+    }
+
+    /* ===============================================================
+    FENÊTRE DES RÈGLES EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode .fenetre-regles {
+        background: #222;
+        color: #eee;
+    }
+
+    body.dark-mode .fenetre-regles p,
+    body.dark-mode .fenetre-regles ul {
+        color: #eee;
+    }
+
+    body.dark-mode .fenetre-regles h1,
+    body.dark-mode .fenetre-regles h2,
+    body.dark-mode .fenetre-regles h3 {
+        color: #00cccc;
+    }
+
+    /* ===============================================================
+    ÉCRANS DE FIN EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode #scoreManche {
+        background: #222;
+        color: #eee;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    body.dark-mode #scoreManche thead tr {
+        background: #0b4d4d;
+    }
+
+    body.dark-mode #scoreManche td {
+        border-bottom: 1px solid #555;
+    }
+
+    body.dark-mode #scoreManche tbody tr.moi {
+        background: #444;
+    }
+
+    body.dark-mode .encadre-classement {
+        background: #333;
+        color: #eee;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    body.dark-mode .tableau-classement thead tr {
+        background: #0b4d4d;
+    }
+
+    body.dark-mode .btn-rejouer {
+        background: #555;
+        color: #00cccc;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode .btn-rejouer:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    }
+
+    body.dark-mode #finPartie {
+        background: linear-gradient(135deg, #000000 0%, #001e1e 100%);
+    }
+
+    body.dark-mode #finPartie h3 {
+        color: #00cccc;
+    }
+
+    body.dark-mode .encadre-gagnant {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .tableau-classement td {
+        border-bottom: 1px solid #555;
+    }
+
+    body.dark-mode .tableau-classement tbody tr.ligne-moi {
+        background: #444;
+    }
+
+    /* ===============================================================
+    FOOTER EN MODE SOMBRE
+    =============================================================== */
+
+    body.dark-mode footer {
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+/* ===============================================================
    ÉCRAN DE CONNEXION
    =============================================================== */
 
@@ -701,6 +935,19 @@ main {
     color: #000000;
     font-size: 20px;
     font-weight: bold;
+}
+
+.fenetre-regles ul {
+    text-align: center;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    color: #000000;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.fenetre-regles ul li {
+    margin-bottom: 10px;
 }
 
 /* ===============================================================

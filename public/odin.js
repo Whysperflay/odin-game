@@ -73,6 +73,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
+        document.addEventListener("keydown", function(e) {
+            if(e.ctrlKey && e.key === 'd'){
+                e.preventDefault();
+                document.body.classList.toggle('dark-mode');
+                console.log('Dark mode toggled');
+            }
+        });
     }
 
     /**
